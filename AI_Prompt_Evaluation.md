@@ -1050,38 +1050,81 @@ builder.Services.AddSingleton<IUserService, UserService>();
 
 ---
 
-# Comparison
+# Comparison Report (500+ Words)
 
 ## Claude Code
 
-Strengths:
--
+### Strengths
+- Produced the most complete and production-ready solution.
+- Followed .NET best practices and REST API conventions.
+- Used proper validation through Data Annotations.
+- Implemented async methods correctly.
+- Used password hashing instead of storing plain text passwords.
+- Returned proper HTTP status codes like 201 Created, 400 Bad Request, 404 Not Found, and 409 Conflict.
+- Used thread-safe collections (ConcurrentDictionary) for in-memory storage.
+- Explained every important concept including CreatedAtAction, ModelState validation, dependency injection, and password security.
+- Generated clean, readable, and maintainable code with good folder organization.
 
-Weaknesses:
--
+### Weaknesses
+- The response was very long.
+- Included many advanced concepts that may be difficult for beginners.
+- Some production-level practices were unnecessary for a simple assignment.
 
 ---
 
 ## GitHub Copilot
 
-Strengths:
--
+### Strengths
+- Generated code quickly inside Visual Studio.
+- Created the required controller, DTO, and service with minimal effort.
+- Used async methods and IActionResult.
+- Returned proper HTTP status codes.
+- Followed common .NET coding conventions.
+- Integrated naturally into the development workflow.
 
-Weaknesses:
--
+### Weaknesses
+- Explanations were much shorter than Claude.
+- Architecture was simpler and less detailed.
+- Some code formatting required manual cleanup.
+- Documentation was limited compared to Claude.
 
 ---
 
 ## Gemini
 
-Strengths:
--
+### Strengths
+- Provided clear explanations suitable for learning.
+- Generated clean and readable code.
+- Explained Clean Architecture in an easy-to-understand manner.
+- Included good comments throughout the code.
+- Helped understand the reasoning behind design decisions.
 
-Weaknesses:
--
+### Weaknesses
+- Some responses repeated similar explanations.
+- Less detailed regarding production best practices.
+- Some implementations were simplified and would require additional improvements before production use.
 
 ---
+
+# Overall Comparison
+
+After evaluating all three AI tools across the three prompts, each tool demonstrated different strengths.
+
+Claude Code consistently generated the highest quality code with strong architecture, proper validation, security considerations, RESTful API design, and detailed explanations. It followed software engineering best practices and produced code that closely resembles production-quality applications. The only downside was that its responses were lengthy and sometimes more advanced than necessary for a beginner-level task.
+
+GitHub Copilot was the fastest tool because it integrates directly with Visual Studio. It generated working code quickly and required minimal prompting. However, its explanations were brief, and some improvements were needed to make the code more maintainable and production-ready.
+
+Gemini performed well as an educational assistant. It explained concepts clearly, making it easier to understand how the API worked. Although its code quality was good, it focused more on teaching than on advanced software architecture.
+
+Overall, Claude Code produced the best response because it balanced clean architecture, maintainability, validation, security, and documentation. GitHub Copilot ranked second due to its speed and IDE integration, while Gemini ranked third because of its educational explanations and beginner-friendly approach.
+
+For real-world development, Claude Code would be my preferred choice for designing complete backend solutions, GitHub Copilot would be ideal for improving developer productivity during coding, and Gemini would be most useful when learning new technologies or understanding programming concepts.
 
 # Conclusion
 
 Overall, Claude Code produced the most structured architectural response. GitHub Copilot was the fastest for code generation inside Visual Studio, while Gemini provided clear explanations and was useful for understanding concepts.
+
+## Mentor Feedback Update
+
+- Added 500-word comparison report.
+- Updated documentation after mentor feedback.
