@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "0yRlFOTcLzw=",
+  "dgSpecHash": "drxVRM36btA=",
   "success": true,
   "projectFilePath": "C:\\Users\\User\\EventApi\\EventApi.csproj",
   "expectedPackageFiles": [
@@ -16,6 +16,7 @@
     "C:\\Users\\User\\.nuget\\packages\\microsoft.entityframeworkcore.analyzers\\10.0.9\\microsoft.entityframeworkcore.analyzers.10.0.9.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\microsoft.entityframeworkcore.relational\\10.0.9\\microsoft.entityframeworkcore.relational.10.0.9.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\microsoft.entityframeworkcore.sqlserver\\10.0.9\\microsoft.entityframeworkcore.sqlserver.10.0.9.nupkg.sha512",
+    "C:\\Users\\User\\.nuget\\packages\\microsoft.extensions.apidescription.server\\10.0.0\\microsoft.extensions.apidescription.server.10.0.0.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\microsoft.identity.client\\4.73.1\\microsoft.identity.client.4.73.1.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\microsoft.identity.client.extensions.msal\\4.73.1\\microsoft.identity.client.extensions.msal.4.73.1.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\microsoft.identitymodel.abstractions\\7.7.1\\microsoft.identitymodel.abstractions.7.7.1.nupkg.sha512",
@@ -24,8 +25,12 @@
     "C:\\Users\\User\\.nuget\\packages\\microsoft.identitymodel.protocols\\7.7.1\\microsoft.identitymodel.protocols.7.7.1.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\microsoft.identitymodel.protocols.openidconnect\\7.7.1\\microsoft.identitymodel.protocols.openidconnect.7.7.1.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\microsoft.identitymodel.tokens\\7.7.1\\microsoft.identitymodel.tokens.7.7.1.nupkg.sha512",
-    "C:\\Users\\User\\.nuget\\packages\\microsoft.openapi\\2.0.0\\microsoft.openapi.2.0.0.nupkg.sha512",
+    "C:\\Users\\User\\.nuget\\packages\\microsoft.openapi\\2.7.5\\microsoft.openapi.2.7.5.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\microsoft.sqlserver.server\\1.0.0\\microsoft.sqlserver.server.1.0.0.nupkg.sha512",
+    "C:\\Users\\User\\.nuget\\packages\\swashbuckle.aspnetcore\\10.2.3\\swashbuckle.aspnetcore.10.2.3.nupkg.sha512",
+    "C:\\Users\\User\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\10.2.3\\swashbuckle.aspnetcore.swagger.10.2.3.nupkg.sha512",
+    "C:\\Users\\User\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\10.2.3\\swashbuckle.aspnetcore.swaggergen.10.2.3.nupkg.sha512",
+    "C:\\Users\\User\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\10.2.3\\swashbuckle.aspnetcore.swaggerui.10.2.3.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\system.clientmodel\\1.5.1\\system.clientmodel.1.5.1.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\system.configuration.configurationmanager\\9.0.4\\system.configuration.configurationmanager.9.0.4.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\system.identitymodel.tokens.jwt\\7.7.1\\system.identitymodel.tokens.jwt.7.7.1.nupkg.sha512",
@@ -33,18 +38,5 @@
     "C:\\Users\\User\\.nuget\\packages\\system.security.cryptography.pkcs\\9.0.4\\system.security.cryptography.pkcs.9.0.4.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\system.security.cryptography.protecteddata\\9.0.4\\system.security.cryptography.protecteddata.9.0.4.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "NU1903",
-      "level": "Warning",
-      "message": "Package 'Microsoft.OpenApi' 2.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-v5pm-xwqc-g5wc",
-      "projectPath": "C:\\Users\\User\\EventApi\\EventApi.csproj",
-      "warningLevel": 1,
-      "filePath": "C:\\Users\\User\\EventApi\\EventApi.csproj",
-      "libraryId": "Microsoft.OpenApi",
-      "targetGraphs": [
-        "net10.0"
-      ]
-    }
-  ]
+  "logs": []
 }

@@ -1,14 +1,14 @@
+C:\Users\User\EventApi\bin\Debug\net10.0\EventApi.exe
+C:\Users\User\EventApi\bin\Debug\net10.0\EventApi.dll
+C:\Users\User\EventApi\bin\Debug\net10.0\Microsoft.AspNetCore.OpenApi.dll
+C:\Users\User\EventApi\bin\Debug\net10.0\Microsoft.OpenApi.dll
+C:\Users\User\EventApi\bin\Debug\net10.0\Swashbuckle.AspNetCore.Swagger.dll
+C:\Users\User\EventApi\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerGen.dll
 C:\Users\User\EventApi\bin\Debug\net10.0\appsettings.Development.json
 C:\Users\User\EventApi\bin\Debug\net10.0\appsettings.json
 C:\Users\User\EventApi\bin\Debug\net10.0\EventApi.staticwebassets.endpoints.json
-C:\Users\User\EventApi\bin\Debug\net10.0\EventApi.exe
-C:\Users\User\EventApi\bin\Debug\net10.0\EventApi.deps.json
-C:\Users\User\EventApi\bin\Debug\net10.0\EventApi.runtimeconfig.json
-C:\Users\User\EventApi\bin\Debug\net10.0\EventApi.dll
-C:\Users\User\EventApi\bin\Debug\net10.0\EventApi.pdb
 C:\Users\User\EventApi\bin\Debug\net10.0\Azure.Core.dll
 C:\Users\User\EventApi\bin\Debug\net10.0\Azure.Identity.dll
-C:\Users\User\EventApi\bin\Debug\net10.0\Microsoft.AspNetCore.OpenApi.dll
 C:\Users\User\EventApi\bin\Debug\net10.0\Microsoft.Bcl.AsyncInterfaces.dll
 C:\Users\User\EventApi\bin\Debug\net10.0\Microsoft.Bcl.Cryptography.dll
 C:\Users\User\EventApi\bin\Debug\net10.0\Microsoft.Data.SqlClient.dll
@@ -24,8 +24,8 @@ C:\Users\User\EventApi\bin\Debug\net10.0\Microsoft.IdentityModel.Logging.dll
 C:\Users\User\EventApi\bin\Debug\net10.0\Microsoft.IdentityModel.Protocols.dll
 C:\Users\User\EventApi\bin\Debug\net10.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 C:\Users\User\EventApi\bin\Debug\net10.0\Microsoft.IdentityModel.Tokens.dll
-C:\Users\User\EventApi\bin\Debug\net10.0\Microsoft.OpenApi.dll
 C:\Users\User\EventApi\bin\Debug\net10.0\Microsoft.SqlServer.Server.dll
+C:\Users\User\EventApi\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerUI.dll
 C:\Users\User\EventApi\bin\Debug\net10.0\System.ClientModel.dll
 C:\Users\User\EventApi\bin\Debug\net10.0\System.Configuration.ConfigurationManager.dll
 C:\Users\User\EventApi\bin\Debug\net10.0\System.IdentityModel.Tokens.Jwt.dll
@@ -57,6 +57,7 @@ C:\Users\User\EventApi\obj\Debug\net10.0\EventApi.AssemblyInfo.cs
 C:\Users\User\EventApi\obj\Debug\net10.0\EventApi.csproj.CoreCompileInputs.cache
 C:\Users\User\EventApi\obj\Debug\net10.0\EventApi.MvcApplicationPartsAssemblyInfo.cs
 C:\Users\User\EventApi\obj\Debug\net10.0\EventApi.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\User\EventApi\obj\Debug\net10.0\EventApi.sourcelink.json
 C:\Users\User\EventApi\obj\Debug\net10.0\rjimswa.dswa.cache.json
 C:\Users\User\EventApi\obj\Debug\net10.0\rjsmrazor.dswa.cache.json
 C:\Users\User\EventApi\obj\Debug\net10.0\rjsmcshtml.dswa.cache.json
@@ -70,5 +71,8 @@ C:\Users\User\EventApi\obj\Debug\net10.0\EventApi.csproj.Up2Date
 C:\Users\User\EventApi\obj\Debug\net10.0\EventApi.dll
 C:\Users\User\EventApi\obj\Debug\net10.0\refint\EventApi.dll
 C:\Users\User\EventApi\obj\Debug\net10.0\EventApi.pdb
+C:\Users\User\EventApi\bin\Debug\net10.0\EventApi.deps.json
+C:\Users\User\EventApi\bin\Debug\net10.0\EventApi.runtimeconfig.json
+C:\Users\User\EventApi\bin\Debug\net10.0\EventApi.pdb
 C:\Users\User\EventApi\obj\Debug\net10.0\EventApi.genruntimeconfig.cache
 C:\Users\User\EventApi\obj\Debug\net10.0\ref\EventApi.dll
