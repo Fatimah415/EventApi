@@ -1,7 +1,7 @@
 # CLAUDE.md
 
 ## Project Overview
-This project is a .NET 8 Web API named EventApi.
+This project is a .NET 10 Web API named EventApi.
 
 ## Coding Conventions
 - Use PascalCase for classes, methods, and public properties.
