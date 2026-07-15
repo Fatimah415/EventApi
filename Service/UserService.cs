@@ -1,24 +1,38 @@
+using EventApi.Data;
 using EventApi.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace EventApi.Services;
 
 public class UserService : IUserService
 {
-    private static readonly List<User> Users = new();
+    private readonly AppDbContext _context;
 
-    public Task<bool> RegisterUserAsync(UserDto userDto)
+    public UserService(AppDbContext context)
     {
-        if (Users.Any(u => u.Email == userDto.Email))
-            return Task.FromResult(false);
+        _context = context;
+    }
 
-        Users.Add(new User
+    public async Task<bool> RegisterUserAsync(UserDto userDto)
+    {
+        // Reject duplicate emails (also enforced by a unique index in the DB).
+        var emailExists = await _context.Users
+            .AnyAsync(u => u.Email == userDto.Email);
+
+        if (emailExists)
+            return false;
+
+        var user = new User
         {
-            Id = Users.Count + 1,
             Name = userDto.Name,
             Email = userDto.Email,
-            Password = userDto.Password
-        });
+            // Never store the plaintext password — hash it with BCrypt.
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(userDto.Password)
+        };
 
-        return Task.FromResult(true);
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
+
+        return true;
     }
 }
