@@ -34,7 +34,7 @@ public class EventsController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = Roles.Admin)]
     public async Task<IActionResult> Create(CreateEventDto dto)
     {
         if (!ModelState.IsValid)
@@ -48,7 +48,7 @@ public class EventsController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = Roles.Admin)]
     public async Task<IActionResult> Update(int id, UpdateEventDto dto)
     {
         if (!ModelState.IsValid)
@@ -62,7 +62,7 @@ public class EventsController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = Roles.Admin)]
     public async Task<IActionResult> Delete(int id)
     {
         var deleted = await _eventService.DeleteAsync(id);

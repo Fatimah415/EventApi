@@ -18,8 +18,13 @@ public class User
     [Required]
     public string PasswordHash { get; set; } = string.Empty;
 
-    // Authorization role: "User" (default) or "Admin".
+    // Authorization role: defaults to the standard user role. See Roles.
     [Required]
     [MaxLength(50)]
-    public string Role { get; set; } = "User";
+    public string Role { get; set; } = Roles.User;
+
+    // Inverse navigations. A user has many bookings (User 1 ---- * EventBooking)
+    // and many favorited events (User * ---- * Event via EventFavorite).
+    public ICollection<EventBooking> Bookings { get; set; } = new List<EventBooking>();
+    public ICollection<EventFavorite> Favorites { get; set; } = new List<EventFavorite>();
 }

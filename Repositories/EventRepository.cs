@@ -17,6 +17,7 @@ public class EventRepository : IEventRepository
     {
         return await _context.Events
             .AsNoTracking()
+            .Include(e => e.Category)
             .OrderBy(e => e.EventDate)
             .ToListAsync();
     }
@@ -25,6 +26,7 @@ public class EventRepository : IEventRepository
     {
         return await _context.Events
             .AsNoTracking()
+            .Include(e => e.Category)
             .FirstOrDefaultAsync(e => e.Id == id);
     }
 

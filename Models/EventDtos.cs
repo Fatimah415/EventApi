@@ -19,9 +19,9 @@ public class CreateEventDto
     [MaxLength(200)]
     public string Location { get; set; } = string.Empty;
 
+    // Which category this event belongs to (FK -> Category).
     [Required]
-    [MaxLength(100)]
-    public string Category { get; set; } = string.Empty;
+    public int CategoryId { get; set; }
 
     // Temporary bridge until Phase 3 (JWT) supplies the owner from the token.
     [Required]
@@ -46,8 +46,7 @@ public class UpdateEventDto
     public string Location { get; set; } = string.Empty;
 
     [Required]
-    [MaxLength(100)]
-    public string Category { get; set; } = string.Empty;
+    public int CategoryId { get; set; }
 }
 
 // Response DTO returned to clients (avoids exposing the entity / navigation).
@@ -58,7 +57,9 @@ public class EventResponseDto
     public string? Description { get; set; }
     public DateTime EventDate { get; set; }
     public string Location { get; set; } = string.Empty;
-    public string Category { get; set; } = string.Empty;
+    public int CategoryId { get; set; }
+    // Convenience: the category's name, when the navigation is loaded.
+    public string? CategoryName { get; set; }
     public int UserId { get; set; }
     public DateTime CreatedAt { get; set; }
 }

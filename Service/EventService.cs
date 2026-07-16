@@ -37,7 +37,7 @@ public class EventService : IEventService
             Description = dto.Description,
             EventDate = dto.EventDate,
             Location = dto.Location,
-            Category = dto.Category,
+            CategoryId = dto.CategoryId,
             UserId = dto.UserId,
             CreatedAt = DateTime.UtcNow
         };
@@ -56,7 +56,7 @@ public class EventService : IEventService
         existing.Description = dto.Description;
         existing.EventDate = dto.EventDate;
         existing.Location = dto.Location;
-        existing.Category = dto.Category;
+        existing.CategoryId = dto.CategoryId;
         // UserId and CreatedAt are intentionally preserved.
 
         await _repository.UpdateAsync(existing);
@@ -80,7 +80,8 @@ public class EventService : IEventService
         Description = ev.Description,
         EventDate = ev.EventDate,
         Location = ev.Location,
-        Category = ev.Category,
+        CategoryId = ev.CategoryId,
+        CategoryName = ev.Category?.Name,
         UserId = ev.UserId,
         CreatedAt = ev.CreatedAt
     };

@@ -25,7 +25,7 @@ public class AuthService : IAuthService
             Email = dto.Email,
             // Never store the plaintext password — hash it with BCrypt.
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
-            Role = "User"
+            Role = Roles.User
         };
 
         await _userRepository.AddUserAsync(user);
