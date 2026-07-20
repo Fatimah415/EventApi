@@ -48,6 +48,9 @@ public class LoginModel : PageModel
         var role    = jwt.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value
                    ?? jwt.Claims.FirstOrDefault(c => c.Type == "role")?.Value;
 
+        var userId  = jwt.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value
+                   ?? jwt.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+
         if (role != Roles.Admin)
         {
             ErrorMessage = "Access denied. Admin role required.";
@@ -59,7 +62,8 @@ public class LoginModel : PageModel
         {
             new(ClaimTypes.Email,   Email),
             new(ClaimTypes.Role,    Roles.Admin),
-            new(ClaimTypes.Name,    Email)
+            new(ClaimTypes.Name,    Email),
+            new(ClaimTypes.NameIdentifier, userId ?? "")
         };
 
         var identity  = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

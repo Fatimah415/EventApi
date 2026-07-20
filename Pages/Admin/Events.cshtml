@@ -12,7 +12,11 @@
 }
 
 <div class="card">
-    <div class="card-title">All Events (@Model.Events.Count() total)</div>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div class="card-title" style="margin-bottom:0;">All Events (@Model.Events.Count() total)</div>
+        <a href="/Admin/Events/Create" class="btn" style="background:#6c63ff; color:white;">+ Create Event</a>
+    </div>
+    <br/>
     <input class="search-box" type="text" id="searchInput" placeholder="Search events by title or location…" oninput="filterTable()" />
 
     @if (Model.Events.Any())
@@ -52,7 +56,8 @@
                             <span style="color:#a0aec0">—</span>
                         }
                     </td>
-                    <td>
+                    <td style="display:flex; gap:6px;">
+                        <a href="/Admin/Events/Edit/@ev.Id" class="btn" style="background:#ebf4ff; color:#2b6cb0; border:1px solid #bee3f8;">Edit</a>
                         <form class="delete-form" method="post" asp-page-handler="Delete" asp-route-id="@ev.Id"
                               onsubmit="return confirm('Delete event @ev.Id?')">
                             @Html.AntiForgeryToken()
