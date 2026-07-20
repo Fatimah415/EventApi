@@ -1,0 +1,55 @@
+@page "/Admin/Login"
+@model EventApi.Pages.Admin.LoginModel
+@{
+    ViewData["Title"] = "Admin Login";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Login — EventBoard</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f5; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .login-card { background: #fff; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,.1); padding: 40px; width: 380px; }
+        .login-title { font-size: 1.5rem; font-weight: 700; color: #1a1a2e; margin-bottom: 8px; }
+        .login-sub { color: #718096; font-size: .9rem; margin-bottom: 28px; }
+        .login-sub span { color: #6c63ff; font-weight: 600; }
+        label { display: block; font-size: .85rem; font-weight: 600; color: #4a5568; margin-bottom: 6px; }
+        input[type=email], input[type=password] { width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: .95rem; margin-bottom: 18px; }
+        input:focus { outline: none; border-color: #6c63ff; }
+        .btn-login { width: 100%; padding: 12px; background: #6c63ff; color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+        .btn-login:hover { background: #5a52d5; }
+        .error { background: #fff5f5; border: 1px solid #fed7d7; color: #c53030; padding: 12px 14px; border-radius: 8px; margin-bottom: 18px; font-size: .88rem; }
+        .hint { margin-top: 20px; background: #f7f8fa; border-radius: 8px; padding: 12px 14px; font-size: .82rem; color: #718096; }
+        .hint strong { color: #4a5568; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="login-title">EventBoard Admin</div>
+        <div class="login-sub">Sign in as <span>Admin</span> to continue</div>
+
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="error">@Model.ErrorMessage</div>
+        }
+
+        <form method="post">
+            @Html.AntiForgeryToken()
+            <label for="email">Email</label>
+            <input type="email" id="email" name="Email" value="@Model.Email" required autocomplete="username" />
+            <label for="password">Password</label>
+            <input type="password" id="password" name="Password" required autocomplete="current-password" />
+            <button type="submit" class="btn-login">Sign In</button>
+        </form>
+
+        <div class="hint">
+            <strong>Dev credentials:</strong><br/>
+            admin@eventboard.com / Admin@123
+        </div>
+    </div>
+</body>
+</html>

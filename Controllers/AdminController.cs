@@ -12,7 +12,7 @@ namespace EventApi.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/admin")]
-[Authorize(Roles = Roles.Admin)]
+[Authorize(Roles = Roles.Admin, AuthenticationSchemes = "Bearer")]
 public class AdminController : ControllerBase
 {
     private readonly IAdminService  _adminService;

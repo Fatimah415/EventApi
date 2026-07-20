@@ -1,0 +1,114 @@
+@page "/Admin"
+@model EventApi.Pages.Admin.IndexModel
+@{
+    ViewData["Title"] = "Dashboard";
+    ViewData["ActivePage"] = "Dashboard";
+    Layout = "/Pages/Shared/_AdminLayout.cshtml";
+}
+
+@if (Model.ErrorMessage != null)
+{
+    <div class="alert alert-error">@Model.ErrorMessage</div>
+}
+
+<div class="stat-grid">
+    <div class="stat-card purple">
+        <div class="stat-label">Total Events</div>
+        <div class="stat-value">@Model.Summary?.TotalEvents</div>
+    </div>
+    <div class="stat-card green">
+        <div class="stat-label">Total Users</div>
+        <div class="stat-value">@Model.Summary?.TotalUsers</div>
+    </div>
+    <div class="stat-card orange">
+        <div class="stat-label">Total Bookings</div>
+        <div class="stat-value">@Model.Summary?.TotalBookings</div>
+    </div>
+    <div class="stat-card green">
+        <div class="stat-label">Confirmed</div>
+        <div class="stat-value">@Model.Summary?.ConfirmedBookings</div>
+    </div>
+    <div class="stat-card orange">
+        <div class="stat-label">Pending</div>
+        <div class="stat-value">@Model.Summary?.PendingBookings</div>
+    </div>
+    <div class="stat-card red">
+        <div class="stat-label">Cancelled</div>
+        <div class="stat-value">@Model.Summary?.CancelledBookings</div>
+    </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+    <div class="card">
+        <div class="card-title">Bookings — Last 30 Days</div>
+        @if (Model.Summary?.BookingsPerDay?.Any() == true)
+        {
+            var days = Model.Summary.BookingsPerDay.ToList();
+            var max = days.Max(d => d.BookingCount);
+            max = max == 0 ? 1 : max;
+            <div class="chart-bar-wrap">
+                @foreach (var d in days)
+                {
+                    var pct = (double)d.BookingCount / max * 100;
+                    <div class="chart-bar-col">
+                        <span class="chart-val">@d.BookingCount</span>
+                        <div class="chart-bar" style="height:@(pct)%"></div>
+                        <span class="chart-label">@d.Date.ToString("M/d")</span>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">No bookings in last 30 days</div>
+        }
+    </div>
+
+    <div class="card">
+        <div class="card-title">Top Events by Bookings</div>
+        @if (Model.Summary?.BookingsPerEvent?.Any() == true)
+        {
+            <table>
+                <thead><tr><th>Event</th><th>Bookings</th></tr></thead>
+                <tbody>
+                @foreach (var e in Model.Summary.BookingsPerEvent.Take(8))
+                {
+                    <tr>
+                        <td>@e.Title</td>
+                        <td><strong>@e.BookingCount</strong></td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="empty-state">No booking data yet</div>
+        }
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-title">Bookings by Month</div>
+    @if (Model.Summary?.BookingsPerMonth?.Any() == true)
+    {
+        var months = Model.Summary.BookingsPerMonth.ToList();
+        var maxM = months.Max(m => m.BookingCount);
+        maxM = maxM == 0 ? 1 : maxM;
+        <div class="chart-bar-wrap" style="height:100px;">
+            @foreach (var m in months)
+            {
+                var pct = (double)m.BookingCount / maxM * 100;
+                <div class="chart-bar-col">
+                    <span class="chart-val">@m.BookingCount</span>
+                    <div class="chart-bar" style="height:@(pct)%;background:#38a169;"></div>
+                    <span class="chart-label">@(System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(m.Month))</span>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">No monthly data yet</div>
+    }
+</div>

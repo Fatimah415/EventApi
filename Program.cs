@@ -3,6 +3,7 @@ using EventApi.Data;
 using EventApi.Middleware;
 using EventApi.Repositories;
 using EventApi.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -13,6 +14,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services
 builder.Services.AddControllers();
+
+// Razor Pages for the browser-based admin panel.
+builder.Services.AddRazorPages();
 
 // Centralized exception handling: unhandled exceptions become RFC 7807
 // ProblemDetails responses instead of leaking stack traces.
@@ -77,23 +81,45 @@ builder.Services.AddHttpClient<IWeatherService, WeatherService>()
     .AddPolicyHandler(Polly.Policy.TimeoutAsync<HttpResponseMessage>(
         TimeSpan.FromSeconds(10)));
 
-// JWT Bearer authentication: validates the Authorization header on every request.
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+// Authentication: two schemes run side-by-side.
+// - JWT Bearer  → protects all /api/* controller endpoints.
+// - Cookie      → protects Razor Pages /Admin/* (browsers cannot send Bearer headers).
+// The default scheme is set to Cookie so that [Authorize] on Razor Pages redirects
+// to the login page instead of returning 401 JSON.
+builder.Services.AddAuthentication(options =>
+{
+    // Razor Pages default → Cookie (enables redirect to /Admin/Login).
+    options.DefaultScheme          = CookieAuthenticationDefaults.AuthenticationScheme;
+    // API controllers explicitly use [Authorize] with Bearer, or the
+    // controller uses [Authorize] and the JWT middleware challenges directly.
+    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+})
+.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+{
+    options.LoginPath  = "/Admin/Login";
+    options.AccessDeniedPath = "/Admin/Login";
+    options.ExpireTimeSpan = TimeSpan.FromHours(8);
+    options.SlidingExpiration = true;
+    // Secure cookie in production; allow HTTP in dev.
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SameSite = SameSiteMode.Strict;
+})
+.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]
-                    ?? throw new InvalidOperationException("Jwt:Key is not configured.")))
-        };
-    });
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]
+                ?? throw new InvalidOperationException("Jwt:Key is not configured.")))
+    };
+});
 
 builder.Services.AddAuthorization();
 
@@ -146,5 +172,8 @@ app.UseAuthorization();
 
 // Map controllers
 app.MapControllers();
+
+// Map Razor Pages (admin panel at /Admin/*).
+app.MapRazorPages();
 
 app.Run();

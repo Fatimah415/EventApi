@@ -26,6 +26,9 @@ public class CreateEventDto
     // Temporary bridge until Phase 3 (JWT) supplies the owner from the token.
     [Required]
     public int UserId { get; set; }
+
+    // Image upload property for multipart/form-data
+    public Microsoft.AspNetCore.Http.IFormFile? Image { get; set; }
 }
 
 // Request DTO for updating an event (owner and CreatedAt are not editable).
@@ -47,6 +50,9 @@ public class UpdateEventDto
 
     [Required]
     public int CategoryId { get; set; }
+
+    // Image upload property for multipart/form-data
+    public Microsoft.AspNetCore.Http.IFormFile? Image { get; set; }
 }
 
 // Response DTO returned to clients (avoids exposing the entity / navigation).
@@ -62,4 +68,5 @@ public class EventResponseDto
     public string? CategoryName { get; set; }
     public int UserId { get; set; }
     public DateTime CreatedAt { get; set; }
+    public string? ImagePath { get; set; }
 }

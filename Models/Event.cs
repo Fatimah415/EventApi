@@ -34,6 +34,9 @@ public class Event
     public ICollection<EventBooking> Bookings { get; set; } = new List<EventBooking>();
     public ICollection<EventFavorite> Favorites { get; set; } = new List<EventFavorite>();
 
+    // Path to the uploaded image for this event.
+    public string? ImagePath { get; set; }
+
     // Server-set on creation; never supplied by the client.
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

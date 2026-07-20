@@ -1,0 +1,63 @@
+@page "/Admin/Bookings"
+@model EventApi.Pages.Admin.BookingsModel
+@{
+    ViewData["Title"] = "Bookings";
+    ViewData["ActivePage"] = "Bookings";
+    Layout = "/Pages/Shared/_AdminLayout.cshtml";
+}
+
+@if (Model.ErrorMessage != null)
+{
+    <div class="alert alert-error">@Model.ErrorMessage</div>
+}
+
+<div class="card">
+    <div class="card-title">All Bookings (@Model.Bookings.Count() total)</div>
+    <input class="search-box" type="text" id="searchInput" placeholder="Search by user, event, or status…" oninput="filterTable()" />
+
+    @if (Model.Bookings.Any())
+    {
+        <table id="bookingsTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Event</th>
+                    <th>Status</th>
+                    <th>Booked At</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var b in Model.Bookings)
+            {
+                <tr>
+                    <td>@b.Id</td>
+                    <td><strong>@b.UserName</strong></td>
+                    <td>@b.UserEmail</td>
+                    <td>@b.EventTitle</td>
+                    <td>
+                        <span class="badge badge-@b.Status.ToString().ToLower()">@b.Status</span>
+                    </td>
+                    <td>@b.BookedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="empty-state">No bookings found.</div>
+    }
+</div>
+
+@section Scripts {
+<script>
+function filterTable() {
+    var q = document.getElementById('searchInput').value.toLowerCase();
+    document.querySelectorAll('#bookingsTable tbody tr').forEach(function(row) {
+        row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+}
+</script>
+}

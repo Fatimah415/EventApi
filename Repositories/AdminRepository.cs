@@ -96,17 +96,19 @@ public class AdminRepository : IAdminRepository
 
         // Bookings per calendar day (last 30 days)
         var cutoff = DateTime.UtcNow.AddDays(-30);
-        var perDay = await _db.EventBookings
+        var perDay = (await _db.EventBookings
             .AsNoTracking()
             .Where(b => b.BookedAt >= cutoff)
             .GroupBy(b => new { b.BookedAt.Year, b.BookedAt.Month, b.BookedAt.Day })
-            .Select(g => new BookingsPerDayDto
+            .Select(g => new { g.Key.Year, g.Key.Month, g.Key.Day, Count = g.Count() })
+            .ToListAsync(ct))
+            .Select(x => new BookingsPerDayDto
             {
-                Date         = new DateOnly(g.Key.Year, g.Key.Month, g.Key.Day),
-                BookingCount = g.Count()
+                Date         = new DateOnly(x.Year, x.Month, x.Day),
+                BookingCount = x.Count
             })
             .OrderBy(x => x.Date)
-            .ToListAsync(ct);
+            .ToList();
 
         // Bookings per month (last 12 months)
         var perMonth = await _db.EventBookings

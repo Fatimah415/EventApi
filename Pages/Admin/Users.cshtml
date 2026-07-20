@@ -1,0 +1,82 @@
+@page "/Admin/Users"
+@model EventApi.Pages.Admin.UsersModel
+@{
+    ViewData["Title"] = "Users";
+    ViewData["ActivePage"] = "Users";
+    Layout = "/Pages/Shared/_AdminLayout.cshtml";
+}
+
+@if (Model.ErrorMessage != null)
+{
+    <div class="alert alert-error">@Model.ErrorMessage</div>
+}
+
+<div class="card">
+    <div class="card-title">All Users (@Model.Users.Count() total)</div>
+    <input class="search-box" type="text" id="searchInput" placeholder="Search users by name or email…" oninput="filterTable()" />
+
+    @if (Model.Users.Any())
+    {
+        <table id="usersTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Bookings</th>
+                    <th>Change Role</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var u in Model.Users)
+            {
+                <tr>
+                    <td>@u.Id</td>
+                    <td><strong>@u.Name</strong></td>
+                    <td>@u.Email</td>
+                    <td>
+                        <span class="badge @(u.Role == "Admin" ? "badge-admin" : "badge-user")">
+                            @u.Role
+                        </span>
+                    </td>
+                    <td>@u.BookingCount</td>
+                    <td>
+                        <form method="post" asp-page-handler="UpdateRole" asp-route-id="@u.Id" style="display:flex;gap:6px;align-items:center;">
+                            @Html.AntiForgeryToken()
+                            <select name="role" style="padding:4px 8px;border:1px solid #e2e8f0;border-radius:5px;font-size:.85rem;">
+                                @if (u.Role == "User")
+                                {
+                                    <option value="User" selected>User</option>
+                                    <option value="Admin">Admin</option>
+                                }
+                                else
+                                {
+                                    <option value="User">User</option>
+                                    <option value="Admin" selected>Admin</option>
+                                }
+                            </select>
+                            <button type="submit" class="btn" style="background:#ebf4ff;color:#2b6cb0;border:1px solid #bee3f8;">Save</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="empty-state">No users found.</div>
+    }
+</div>
+
+@section Scripts {
+<script>
+function filterTable() {
+    var q = document.getElementById('searchInput').value.toLowerCase();
+    document.querySelectorAll('#usersTable tbody tr').forEach(function(row) {
+        row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+}
+</script>
+}
