@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Polly;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +39,43 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Reporting: raw ADO.NET repository.
 builder.Services.AddScoped<IReportRepository, ReportRepository>();
+
+// Admin panel: repository + service.
+builder.Services.AddScoped<IAdminRepository, AdminRepository>();
+builder.Services.AddScoped<IAdminService, AdminService>();
+
+// File upload feature.
+// FileValidator is Singleton: it is stateless (no DB dependency) and its
+// _fileSignatures dictionary is read-only after construction, so sharing one
+// instance across all requests is safe and avoids repeated allocations.
+builder.Services.AddSingleton<IFileValidator, FileValidator>();
+
+// FileService is Scoped: it depends on IWebHostEnvironment (Singleton) and
+// IFileValidator (Singleton), but Scoped is the safer default lifetime for
+// services that perform I/O, as it aligns with the request lifetime and
+// makes future dependencies (e.g. a Scoped DbContext) straightforward to add.
+builder.Services.AddScoped<IFileService, FileService>();
+
+// Weather API integration.
+// AddHttpClient<TInterface, TImplementation> registers WeatherService as a Typed
+// HttpClient — IHttpClientFactory manages the HttpClient lifecycle (pooled handlers,
+// DNS recycling) so we never use "new HttpClient()".
+// Polly policies are chained as delegating handlers in the HttpClient pipeline.
+builder.Services.AddHttpClient<IWeatherService, WeatherService>()
+    // Retry: up to 3 retries with exponential backoff (1s, 2s, 4s).
+    // Only retries transient errors (5xx, 408, HttpRequestException).
+    .AddTransientHttpErrorPolicy(p => p.WaitAndRetryAsync(
+        retryCount: 3,
+        sleepDurationProvider: attempt => TimeSpan.FromSeconds(Math.Pow(2, attempt - 1))))
+    // Circuit Breaker: after 5 consecutive transient failures, reject all requests
+    // immediately for 30 seconds. Prevents hammering a downed upstream service.
+    .AddTransientHttpErrorPolicy(p => p.CircuitBreakerAsync(
+        handledEventsAllowedBeforeBreaking: 5,
+        durationOfBreak: TimeSpan.FromSeconds(30)))
+    // Timeout: cancel any single HTTP attempt that takes longer than 10 seconds.
+    // This is the outermost policy — it caps the total time including retries.
+    .AddPolicyHandler(Polly.Policy.TimeoutAsync<HttpResponseMessage>(
+        TimeSpan.FromSeconds(10)));
 
 // JWT Bearer authentication: validates the Authorization header on every request.
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -93,6 +131,14 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Enables serving static files from wwwroot (including wwwroot/uploads).
+// Without this middleware, GET requests to /uploads/{filename} return 404
+// even though the file physically exists on disk.
+// Placed after UseHttpsRedirection and before UseAuthentication so that
+// image URLs can be fetched by browsers without requiring a JWT — images
+// are public assets identified only by their unguessable GUID filename.
+app.UseStaticFiles();
 
 // Order matters: authentication must run before authorization.
 app.UseAuthentication();
