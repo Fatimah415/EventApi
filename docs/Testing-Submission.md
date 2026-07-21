@@ -21,7 +21,7 @@ Coverlet stores truncated rate values (`97.93%` and `94.11%`) in Cobertura XML. 
 
 - **Technical Loom video:** `[ADD TECHNICAL LOOM URL]`
 - **Non-technical UAT Loom video:** `[ADD NON-TECHNICAL UAT LOOM URL]`
-- **Test-branch pull request:** `[ADD TEST BRANCH PR URL]`
+- **Test-branch pull request:** [Fatimah415/EventApi#2](https://github.com/Fatimah415/EventApi/pull/2)
 - **Coverage screenshot:** `docs/evidence/two-service-coverage.png`
 - **UAT plan:** `docs/UAT-Plan.md`
 - **AI testing prompts:** `docs/testing-ai-prompts.md`
@@ -90,7 +90,7 @@ Do not commit `bin/`, `obj/`, `TestResults/`, uploaded files, `AGENTS.md`, the u
 | Deliverable | Status |
 |---|---|
 | Two meaningfully unit-tested services | COMPLETE |
-| Unit and integration test project | COMPLETE locally; files must be committed |
+| Unit and integration test project | COMPLETE |
 | Combined line coverage greater than 80% | COMPLETE — 97.94% |
 | Dedicated two-service Coverlet profile | COMPLETE |
 | UAT plan with at least eight scripts | COMPLETE — 10 scripts |
@@ -98,4 +98,4 @@ Do not commit `bin/`, `obj/`, `TestResults/`, uploaded files, `AGENTS.md`, the u
 | Coverage screenshot | COMPLETE |
 | Technical Loom video and URL | REMAINING |
 | Non-technical UAT Loom video and URL | REMAINING |
-| Test branch, PR, and real PR URL | REMAINING |
+| Test branch, PR, and real PR URL | COMPLETE |
