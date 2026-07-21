@@ -1,0 +1,57 @@
+@page
+@model EventApi.Pages.Admin.Events.CreateModel
+@{
+    ViewData["Title"] = "Create Event";
+    ViewData["ActivePage"] = "Events";
+    Layout = "/Pages/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <div class="card-title">Create New Event</div>
+    
+    @if (!ModelState.IsValid)
+    {
+        <div class="alert alert-error">
+            <div asp-validation-summary="All"></div>
+        </div>
+    }
+
+    <form method="post" enctype="multipart/form-data">
+        <div style="margin-bottom: 16px;">
+            <label style="display:block; font-size:.85rem; font-weight:600; margin-bottom:6px;">Title</label>
+            <input type="text" asp-for="Input.Title" class="search-box" style="margin-bottom:0;" required />
+        </div>
+        <div style="margin-bottom: 16px;">
+            <label style="display:block; font-size:.85rem; font-weight:600; margin-bottom:6px;">Description</label>
+            <textarea asp-for="Input.Description" class="search-box" style="margin-bottom:0; min-height:100px; font-family:inherit;"></textarea>
+        </div>
+        <div style="margin-bottom: 16px;">
+            <label style="display:block; font-size:.85rem; font-weight:600; margin-bottom:6px;">Event Date</label>
+            <input type="datetime-local" asp-for="Input.EventDate" class="search-box" style="margin-bottom:0;" required />
+        </div>
+        <div style="margin-bottom: 16px;">
+            <label style="display:block; font-size:.85rem; font-weight:600; margin-bottom:6px;">Location</label>
+            <input type="text" asp-for="Input.Location" class="search-box" style="margin-bottom:0;" required />
+        </div>
+        <div style="margin-bottom: 16px;">
+            <label style="display:block; font-size:.85rem; font-weight:600; margin-bottom:6px;">Category</label>
+            <select asp-for="Input.CategoryId" class="search-box" style="margin-bottom:0;" required>
+                <option value="">Select a Category</option>
+                @foreach (var cat in Model.Categories)
+                {
+                    <option value="@cat.Id">@cat.Name</option>
+                }
+            </select>
+        </div>
+        <div style="margin-bottom: 24px;">
+            <label style="display:block; font-size:.85rem; font-weight:600; margin-bottom:6px;">Cover Image (Optional)</label>
+            <input type="file" asp-for="Input.Image" accept="image/jpeg,image/png" class="search-box" style="margin-bottom:0; padding:6px;" />
+            <small style="color:#718096; font-size:.75rem;">JPG or PNG, max 5MB.</small>
+        </div>
+        
+        <div style="display:flex; gap:12px;">
+            <button type="submit" class="btn" style="background:#6c63ff; color:white;">Create Event</button>
+            <a href="/Admin/Events" class="btn" style="background:#f0f2f5; color:#4a5568;">Cancel</a>
+        </div>
+    </form>
+</div>
