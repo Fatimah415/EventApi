@@ -83,29 +83,45 @@ public class FileService : IFileService
 
         var uploadsFolder = GetUploadsFolder();
 
-        // Guard 2: Reconstruct the absolute physical path from the relative path
-        //          stored in the database (e.g. /uploads/{guid}.jpg → C:\...\wwwroot\uploads\{guid}.jpg).
-        var fileName     = Path.GetFileName(imagePath); // strips any directory portion
-        var absolutePath = Path.GetFullPath(Path.Combine(uploadsFolder, fileName));
+        // Guard 2: Reconstruct the absolute physical path safely.
+        // The imagePath from the DB usually looks like "/uploads/filename.jpg".
+        // We safely map this URL path to a relative file path.
+        var relativePath = imagePath;
+        if (relativePath.StartsWith("/uploads/", StringComparison.OrdinalIgnoreCase))
+        {
+            relativePath = relativePath.Substring("/uploads/".Length);
+        }
+        else if (relativePath.StartsWith("\\uploads\\", StringComparison.OrdinalIgnoreCase))
+        {
+            relativePath = relativePath.Substring("\\uploads\\".Length);
+        }
 
-        // Guard 3: Path traversal prevention.
-        //          Ensure the resolved path is still inside wwwroot/uploads.
-        //          Path.GetFullPath normalises ".." segments, so comparing with
-        //          StartsWith catches any attempt to escape the uploads directory.
+        // Remove any leading slashes to prevent Path.Combine from treating it as an absolute rooted path.
+        relativePath = relativePath.TrimStart('/', '\\');
+
+        var absolutePath = Path.GetFullPath(Path.Combine(uploadsFolder, relativePath));
+
+        // Guard 3: Path traversal & prefix attack prevention.
         var safeBoundary = Path.GetFullPath(uploadsFolder);
+
+        // Ensure the boundary ends with a directory separator to prevent prefix attacks
+        // (e.g. C:\wwwroot\uploads_evil matching C:\wwwroot\uploads)
+        if (!safeBoundary.EndsWith(Path.DirectorySeparatorChar.ToString()))
+        {
+            safeBoundary += Path.DirectorySeparatorChar;
+        }
+
         if (!absolutePath.StartsWith(safeBoundary, StringComparison.OrdinalIgnoreCase))
         {
-            // This is a server-side logic error, not a client mistake — 500 is correct.
+            // The path resolved outside the uploads directory. Throw an exception to flag the attack.
             throw new InvalidOperationException(
                 $"Attempted to delete a file outside the uploads directory: {absolutePath}");
         }
 
-        // Guard 4: Silently skip deletion if the file no longer exists
-        //          (e.g. was manually removed, or the earlier save failed).
+        // Guard 4: Silently skip deletion if the file no longer exists.
         if (!File.Exists(absolutePath))
             return Task.CompletedTask;
 
-        // Delete the file; IOException bubbles to GlobalExceptionHandler → 500.
         File.Delete(absolutePath);
         return Task.CompletedTask;
     }

@@ -88,7 +88,7 @@ public class EventServiceTests
     public async Task CreateAsync_UserDoesNotExist_ReturnsNull()
     {
         // Arrange
-        var dto = new CreateEventDto { UserId = 99 };
+        var dto = ValidCreateDto(userId: 99);
         _repositoryMock.Setup(repo => repo.UserExistsAsync(99)).ReturnsAsync(false);
 
         // Act
@@ -103,7 +103,7 @@ public class EventServiceTests
     public async Task CreateAsync_ValidDtoWithoutImage_AddsToRepository()
     {
         // Arrange
-        var dto = new CreateEventDto { UserId = 1, Title = "Test" };
+        var dto = ValidCreateDto();
         _repositoryMock.Setup(repo => repo.UserExistsAsync(1)).ReturnsAsync(true);
 
         // Act
@@ -123,7 +123,7 @@ public class EventServiceTests
     {
         // Arrange
         var mockFile = new Mock<IFormFile>();
-        var dto = new CreateEventDto { UserId = 1, Title = "Test", Image = mockFile.Object };
+        var dto = ValidCreateDto(image: mockFile.Object);
         
         _repositoryMock.Setup(repo => repo.UserExistsAsync(1)).ReturnsAsync(true);
         _fileServiceMock.Setup(fs => fs.SaveImageAsync(mockFile.Object)).ReturnsAsync("image.jpg");
@@ -144,7 +144,7 @@ public class EventServiceTests
     {
         // Arrange
         var mockFile = new Mock<IFormFile>();
-        var dto = new CreateEventDto { UserId = 1, Title = "Test", Image = mockFile.Object };
+        var dto = ValidCreateDto(image: mockFile.Object);
         
         _repositoryMock.Setup(repo => repo.UserExistsAsync(1)).ReturnsAsync(true);
         _fileServiceMock.Setup(fs => fs.SaveImageAsync(mockFile.Object)).ReturnsAsync("image.jpg");
@@ -167,7 +167,7 @@ public class EventServiceTests
         _repositoryMock.Setup(repo => repo.GetByIdAsync(1)).ReturnsAsync((Event?)null);
 
         // Act
-        var result = await _sut.UpdateAsync(1, new UpdateEventDto());
+        var result = await _sut.UpdateAsync(1, ValidUpdateDto());
 
         // Assert
         Assert.False(result);
@@ -179,7 +179,7 @@ public class EventServiceTests
     {
         // Arrange
         var existing = new Event { Id = 1, Title = "Old", ImagePath = "old.jpg" };
-        var dto = new UpdateEventDto { Title = "New" };
+        var dto = ValidUpdateDto();
         
         _repositoryMock.Setup(repo => repo.GetByIdAsync(1)).ReturnsAsync(existing);
 
@@ -202,7 +202,7 @@ public class EventServiceTests
         // Arrange
         var existing = new Event { Id = 1, Title = "Old", ImagePath = "old.jpg" };
         var mockFile = new Mock<IFormFile>();
-        var dto = new UpdateEventDto { Title = "New", Image = mockFile.Object };
+        var dto = ValidUpdateDto(mockFile.Object);
         
         _repositoryMock.Setup(repo => repo.GetByIdAsync(1)).ReturnsAsync(existing);
         _fileServiceMock.Setup(fs => fs.SaveImageAsync(mockFile.Object)).ReturnsAsync("new.jpg");
@@ -226,7 +226,7 @@ public class EventServiceTests
         // Arrange
         var existing = new Event { Id = 1, Title = "Old", ImagePath = "old.jpg" };
         var mockFile = new Mock<IFormFile>();
-        var dto = new UpdateEventDto { Title = "New", Image = mockFile.Object };
+        var dto = ValidUpdateDto(mockFile.Object);
         
         _repositoryMock.Setup(repo => repo.GetByIdAsync(1)).ReturnsAsync(existing);
         _fileServiceMock.Setup(fs => fs.SaveImageAsync(mockFile.Object)).ReturnsAsync("new.jpg");
@@ -288,4 +288,117 @@ public class EventServiceTests
         _repositoryMock.Verify(repo => repo.DeleteAsync(existing), Times.Once);
         _fileServiceMock.Verify(fs => fs.DeleteImageAsync("image.jpg"), Times.Once);
     }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public async Task GetByIdAsync_InvalidId_ThrowsArgumentException(int id)
+    {
+        await Assert.ThrowsAsync<ArgumentException>(() => _sut.GetByIdAsync(id));
+        _repositoryMock.Verify(repo => repo.GetByIdAsync(It.IsAny<int>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task CreateAsync_NullDto_ThrowsArgumentNullException()
+    {
+        await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.CreateAsync(null!));
+        _repositoryMock.Verify(repo => repo.UserExistsAsync(It.IsAny<int>()), Times.Never);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task CreateAsync_MissingTitle_ThrowsArgumentException(string title)
+    {
+        var dto = ValidCreateDto();
+        dto.Title = title;
+
+        await Assert.ThrowsAsync<ArgumentException>(() => _sut.CreateAsync(dto));
+        _repositoryMock.Verify(repo => repo.UserExistsAsync(It.IsAny<int>()), Times.Never);
+    }
+
+    [Theory]
+    [InlineData("", 1, 1)]
+    [InlineData("   ", 1, 1)]
+    [InlineData("Lahore", 0, 1)]
+    [InlineData("Lahore", 1, 0)]
+    public async Task CreateAsync_InvalidForeignOrLocationField_ThrowsArgumentException(
+        string location,
+        int categoryId,
+        int userId)
+    {
+        var dto = ValidCreateDto(userId);
+        dto.Location = location;
+        dto.CategoryId = categoryId;
+
+        await Assert.ThrowsAsync<ArgumentException>(() => _sut.CreateAsync(dto));
+        _repositoryMock.Verify(repo => repo.UserExistsAsync(It.IsAny<int>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_NullDto_ThrowsArgumentNullException()
+    {
+        await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.UpdateAsync(1, null!));
+        _repositoryMock.Verify(repo => repo.GetByIdAsync(It.IsAny<int>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_OldImageDeleteFails_ReturnsSuccess()
+    {
+        var existing = new Event { Id = 1, Title = "Old", ImagePath = "old.jpg" };
+        var mockFile = new Mock<IFormFile>();
+        _repositoryMock.Setup(repo => repo.GetByIdAsync(1)).ReturnsAsync(existing);
+        _fileServiceMock.Setup(service => service.SaveImageAsync(mockFile.Object)).ReturnsAsync("new.jpg");
+        _fileServiceMock.Setup(service => service.DeleteImageAsync("old.jpg")).ThrowsAsync(new IOException());
+
+        var result = await _sut.UpdateAsync(1, ValidUpdateDto(mockFile.Object));
+
+        Assert.True(result);
+        _loggerMock.VerifyLog(LogLevel.Warning, Times.Once());
+    }
+
+    [Fact]
+    public async Task DeleteAsync_ImageDeleteFails_ReturnsSuccess()
+    {
+        var existing = new Event { Id = 1, ImagePath = "image.jpg" };
+        _repositoryMock.Setup(repo => repo.GetByIdAsync(1)).ReturnsAsync(existing);
+        _fileServiceMock.Setup(service => service.DeleteImageAsync("image.jpg")).ThrowsAsync(new IOException());
+
+        var result = await _sut.DeleteAsync(1);
+
+        Assert.True(result);
+        _loggerMock.VerifyLog(LogLevel.Warning, Times.Once());
+    }
+
+    private static CreateEventDto ValidCreateDto(int userId = 1, IFormFile? image = null) => new()
+    {
+        Title = "Test",
+        Location = "Lahore",
+        EventDate = DateTime.UtcNow.AddDays(1),
+        CategoryId = 1,
+        UserId = userId,
+        Image = image
+    };
+
+    private static UpdateEventDto ValidUpdateDto(IFormFile? image = null) => new()
+    {
+        Title = "New",
+        Location = "Karachi",
+        EventDate = DateTime.UtcNow.AddDays(2),
+        CategoryId = 2,
+        Image = image
+    };
+}
+
+internal static class LoggerMockExtensions
+{
+    public static void VerifyLog<T>(this Mock<ILogger<T>> loggerMock, LogLevel level, Times times) =>
+        loggerMock.Verify(
+            logger => logger.Log(
+                level,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((_, _) => true),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            times);
 }

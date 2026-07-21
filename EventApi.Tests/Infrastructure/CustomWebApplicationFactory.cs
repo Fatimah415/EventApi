@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace EventApi.Tests.Infrastructure;
 
@@ -13,16 +15,20 @@ public class CustomWebApplicationFactory<TProgram>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.UseSetting("Jwt:Key", "EventApi.IntegrationTests.SigningKey.MustBeAtLeast32Bytes!");
+        builder.UseSetting("Jwt:Issuer", "EventApi.Tests");
+        builder.UseSetting("Jwt:Audience", "EventApi.Tests.Client");
+
+        builder.ConfigureLogging(logging =>
+        {
+            logging.ClearProviders();
+            logging.AddDebug();
+        });
+
         builder.ConfigureServices(services =>
         {
-            // Find the existing DbContext registration and remove it
-            var descriptor = services.SingleOrDefault(
-                d => d.ServiceType == typeof(DbContextOptions<AppDbContext>));
-
-            if (descriptor != null)
-            {
-                services.Remove(descriptor);
-            }
+            services.RemoveAll<DbContextOptions<AppDbContext>>();
+            services.RemoveAll<AppDbContext>();
 
             // Add an InMemory database with a unique name for this factory instance
             var dbName = $"InMemoryDbForTesting_{Guid.NewGuid()}";
@@ -31,12 +37,11 @@ public class CustomWebApplicationFactory<TProgram>
                 options.UseInMemoryDatabase(dbName);
             });
             
-            // Build the service provider.
-            var sp = services.BuildServiceProvider();
+            var serviceProvider = services.BuildServiceProvider();
 
             // Create a scope to obtain a reference to the database
             // context (AppDbContext).
-            using (var scope = sp.CreateScope())
+            using (var scope = serviceProvider.CreateScope())
             {
                 var scopedServices = scope.ServiceProvider;
                 var db = scopedServices.GetRequiredService<AppDbContext>();
@@ -44,7 +49,7 @@ public class CustomWebApplicationFactory<TProgram>
                 // Ensure the database is created.
                 db.Database.EnsureCreated();
                 
-                // Intentionally NOT seeding data yet as requested.
+                // AppDbContext HasData records are inserted by EnsureCreated.
             }
         });
     }

@@ -33,6 +33,7 @@ public class EventService : IEventService
     // -------------------------------------------------------------------------
     public async Task<EventResponseDto?> GetByIdAsync(int id)
     {
+        ValidateId(id);
         var ev = await _repository.GetByIdAsync(id);
         return ev is null ? null : MapToDto(ev);
     }
@@ -42,6 +43,9 @@ public class EventService : IEventService
     // -------------------------------------------------------------------------
     public async Task<EventResponseDto?> CreateAsync(CreateEventDto dto)
     {
+        ArgumentNullException.ThrowIfNull(dto);
+        ValidateCreateDto(dto);
+
         // Existing validation: owner must exist.
         if (!await _repository.UserExistsAsync(dto.UserId))
             return null;
@@ -86,6 +90,10 @@ public class EventService : IEventService
     // -------------------------------------------------------------------------
     public async Task<bool> UpdateAsync(int id, UpdateEventDto dto)
     {
+        ValidateId(id);
+        ArgumentNullException.ThrowIfNull(dto);
+        ValidateUpdateDto(dto);
+
         // GetByIdAsync uses AsNoTracking() so we re-attach via Update() later.
         var existing = await _repository.GetByIdAsync(id);
         if (existing is null)
@@ -111,6 +119,10 @@ public class EventService : IEventService
         existing.EventDate   = dto.EventDate;
         existing.Location    = dto.Location;
         existing.CategoryId  = dto.CategoryId;
+        // GetByIdAsync loads Category for response mapping. This entity is detached
+        // (AsNoTracking), so clear the stale navigation before Update attaches it;
+        // otherwise EF relationship fix-up can restore the old CategoryId.
+        existing.Category    = null;
 
         // Persist the update.
         try
@@ -156,6 +168,7 @@ public class EventService : IEventService
     // -------------------------------------------------------------------------
     public async Task<bool> DeleteAsync(int id)
     {
+        ValidateId(id);
         var existing = await _repository.GetByIdAsync(id);
         if (existing is null)
             return false;
@@ -189,6 +202,35 @@ public class EventService : IEventService
         }
 
         return true;
+    }
+
+    private static void ValidateId(int id)
+    {
+        if (id <= 0)
+            throw new ArgumentException("Event ID must be greater than zero.", nameof(id));
+    }
+
+    private static void ValidateCreateDto(CreateEventDto dto)
+    {
+        ValidateEventFields(dto.Title, dto.Location, dto.CategoryId);
+
+        if (dto.UserId <= 0)
+            throw new ArgumentException("User ID must be greater than zero.", nameof(dto));
+    }
+
+    private static void ValidateUpdateDto(UpdateEventDto dto) =>
+        ValidateEventFields(dto.Title, dto.Location, dto.CategoryId);
+
+    private static void ValidateEventFields(string title, string location, int categoryId)
+    {
+        if (string.IsNullOrWhiteSpace(title))
+            throw new ArgumentException("Event title is required.", nameof(title));
+
+        if (string.IsNullOrWhiteSpace(location))
+            throw new ArgumentException("Event location is required.", nameof(location));
+
+        if (categoryId <= 0)
+            throw new ArgumentException("Category ID must be greater than zero.", nameof(categoryId));
     }
 
     // -------------------------------------------------------------------------
