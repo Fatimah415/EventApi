@@ -1,5 +1,6 @@
 using EventApi.Models;
 using EventApi.Services;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -103,6 +104,23 @@ public class AdminController : ControllerBase
             return BadRequest("Role must not be empty.");
 
         var updated = await _adminService.UpdateUserRoleAsync(id, dto.Role, ct);
+        return updated ? NoContent() : NotFound($"User {id} not found.");
+    }
+
+    [HttpPost("users/{id:int}/disable")]
+    public Task<IActionResult> DisableUser(int id, CancellationToken ct) =>
+        SetUserActiveAsync(id, false, ct);
+
+    [HttpPost("users/{id:int}/enable")]
+    public Task<IActionResult> EnableUser(int id, CancellationToken ct) =>
+        SetUserActiveAsync(id, true, ct);
+
+    private async Task<IActionResult> SetUserActiveAsync(int id, bool isActive, CancellationToken ct)
+    {
+        if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var currentAdminId))
+            return Unauthorized();
+
+        var updated = await _adminService.SetUserActiveAsync(id, isActive, currentAdminId, ct);
         return updated ? NoContent() : NotFound($"User {id} not found.");
     }
 

@@ -11,6 +11,8 @@ namespace EventApi.Models;
 /// </summary>
 public class WeatherDto
 {
+    public bool Available { get; set; }
+    public string? Message { get; set; }
     public string City { get; set; } = string.Empty;
     public double TemperatureCelsius { get; set; }
     public double FeelsLikeCelsius { get; set; }

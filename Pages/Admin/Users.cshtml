@@ -10,6 +10,10 @@
 {
     <div class="alert alert-error">@Model.ErrorMessage</div>
 }
+@if (TempData["Error"] is string actionError)
+{
+    <div class="alert alert-error">@actionError</div>
+}
 
 <div class="card">
     <div class="card-title">All Users (@Model.Users.Count() total)</div>
@@ -24,8 +28,10 @@
                     <th>Name</th>
                     <th>Email</th>
                     <th>Role</th>
+                    <th>Status</th>
                     <th>Bookings</th>
                     <th>Change Role</th>
+                    <th>Account</th>
                 </tr>
             </thead>
             <tbody>
@@ -38,6 +44,11 @@
                     <td>
                         <span class="badge @(u.Role == "Admin" ? "badge-admin" : "badge-user")">
                             @u.Role
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge @(u.IsActive ? "badge-user" : "")">
+                            @(u.IsActive ? "Active" : "Disabled")
                         </span>
                     </td>
                     <td>@u.BookingCount</td>
@@ -58,6 +69,22 @@
                             </select>
                             <button type="submit" class="btn" style="background:#ebf4ff;color:#2b6cb0;border:1px solid #bee3f8;">Save</button>
                         </form>
+                    </td>
+                    <td>
+                        @if (u.IsActive)
+                        {
+                            <form method="post" asp-page-handler="Disable" asp-route-id="@u.Id">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn">Disable</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form method="post" asp-page-handler="Enable" asp-route-id="@u.Id">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn">Enable</button>
+                            </form>
+                        }
                     </td>
                 </tr>
             }

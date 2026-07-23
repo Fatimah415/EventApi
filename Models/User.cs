@@ -23,6 +23,8 @@ public class User
     [MaxLength(50)]
     public string Role { get; set; } = Roles.User;
 
+    public bool IsActive { get; set; } = true;
+
     // Inverse navigations. A user has many bookings (User 1 ---- * EventBooking)
     // and many favorited events (User * ---- * Event via EventFavorite).
     public ICollection<EventBooking> Bookings { get; set; } = new List<EventBooking>();

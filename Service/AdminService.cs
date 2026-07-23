@@ -9,6 +9,11 @@ public interface IAdminService
     Task<IEnumerable<AdminUserDto>> GetAllUsersAsync(CancellationToken ct = default);
     Task<AdminUserDto?> GetUserByIdAsync(int id, CancellationToken ct = default);
     Task<bool> UpdateUserRoleAsync(int id, string role, CancellationToken ct = default);
+    Task<bool> SetUserActiveAsync(
+        int id,
+        bool isActive,
+        int currentAdminId,
+        CancellationToken ct = default);
 
     // Bookings
     Task<IEnumerable<AdminBookingDto>> GetAllBookingsAsync(CancellationToken ct = default);
@@ -51,7 +56,8 @@ public class AdminService : IAdminService
             Id    = user.Id,
             Name  = user.Name,
             Email = user.Email,
-            Role  = user.Role
+            Role = user.Role,
+            IsActive = user.IsActive
         };
     }
 
@@ -68,6 +74,39 @@ public class AdminService : IAdminService
 
         if (updated)
             _logger.LogInformation("Admin updated User {UserId} role to {Role}.", id, role);
+
+        return updated;
+    }
+
+    public async Task<bool> SetUserActiveAsync(
+        int id,
+        bool isActive,
+        int currentAdminId,
+        CancellationToken ct = default)
+    {
+        if (id <= 0)
+            throw new ArgumentException("A valid user id is required.", nameof(id));
+
+        var user = await _repo.GetUserByIdAsync(id, ct);
+        if (user is null) return false;
+
+        if (!isActive && id == currentAdminId)
+            throw new ArgumentException("You cannot disable your own account.");
+
+        if (!isActive &&
+            user.Role == Roles.Admin &&
+            user.IsActive &&
+            await _repo.CountActiveAdminsAsync(ct) <= 1)
+        {
+            throw new ArgumentException("The last active administrator cannot be disabled.");
+        }
+
+        var updated = await _repo.SetUserActiveAsync(id, isActive, ct);
+        if (updated)
+            _logger.LogInformation(
+                "Admin changed User {UserId} active status to {IsActive}.",
+                id,
+                isActive);
 
         return updated;
     }

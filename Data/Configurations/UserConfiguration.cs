@@ -25,6 +25,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired()
             .HasMaxLength(50);
 
+        builder.Property(u => u.IsActive)
+            .HasDefaultValue(true);
+
         // Emails must be unique (moved here from OnModelCreating).
         builder.HasIndex(u => u.Email).IsUnique();
 

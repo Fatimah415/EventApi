@@ -10,6 +10,8 @@ public interface IAdminRepository
     Task<IEnumerable<AdminUserDto>> GetAllUsersAsync(CancellationToken ct = default);
     Task<User?> GetUserByIdAsync(int id, CancellationToken ct = default);
     Task<bool> UpdateUserRoleAsync(int id, string role, CancellationToken ct = default);
+    Task<bool> SetUserActiveAsync(int id, bool isActive, CancellationToken ct = default);
+    Task<int> CountActiveAdminsAsync(CancellationToken ct = default);
 
     // Bookings
     Task<IEnumerable<AdminBookingDto>> GetAllBookingsAsync(CancellationToken ct = default);
@@ -41,6 +43,7 @@ public class AdminRepository : IAdminRepository
                 Name         = u.Name,
                 Email        = u.Email,
                 Role         = u.Role,
+                IsActive     = u.IsActive,
                 BookingCount = u.Bookings.Count
             })
             .OrderBy(u => u.Id)
@@ -60,6 +63,19 @@ public class AdminRepository : IAdminRepository
         await _db.SaveChangesAsync(ct);
         return true;
     }
+
+    public async Task<bool> SetUserActiveAsync(int id, bool isActive, CancellationToken ct = default)
+    {
+        var user = await _db.Users.FindAsync([id], ct);
+        if (user is null) return false;
+
+        user.IsActive = isActive;
+        await _db.SaveChangesAsync(ct);
+        return true;
+    }
+
+    public Task<int> CountActiveAdminsAsync(CancellationToken ct = default) =>
+        _db.Users.CountAsync(u => u.Role == Roles.Admin && u.IsActive, ct);
 
     // ── Bookings ──────────────────────────────────────────────────────────────
 

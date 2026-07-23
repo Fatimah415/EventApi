@@ -43,7 +43,7 @@ public class EventsController : ControllerBase
     // EventService (load event) and WeatherService (fetch weather) without
     // adding business logic to either service.
     [HttpGet("{id}/weather")]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetWeather(int id)
     {
         // 1. Load the event to get its location.
@@ -57,7 +57,7 @@ public class EventsController : ControllerBase
 
         // 3. Fetch weather — all errors (invalid city, API failures, timeouts)
         //    are thrown as exceptions and handled by GlobalExceptionHandler.
-        var weather = await _weatherService.GetWeatherAsync(ev.Location);
+        var weather = await _weatherService.GetWeatherAsync(ev.Location, HttpContext.RequestAborted);
         return Ok(weather);
     }
 

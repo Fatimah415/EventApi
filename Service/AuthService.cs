@@ -25,7 +25,8 @@ public class AuthService : IAuthService
             Email = dto.Email,
             // Never store the plaintext password — hash it with BCrypt.
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
-            Role = Roles.User
+            Role = Roles.User,
+            IsActive = true
         };
 
         await _userRepository.AddUserAsync(user);
@@ -38,7 +39,7 @@ public class AuthService : IAuthService
 
         // Same null result for unknown email and wrong password so the
         // response never reveals which one was incorrect.
-        if (user is null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
+        if (user is null || !user.IsActive || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
             return null;
 
         var (token, expiresAt) = _jwtTokenService.GenerateToken(user);
