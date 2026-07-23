@@ -16,27 +16,35 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register(RegisterDto dto)
+    public async Task<IActionResult> Register(RegisterDto dto, CancellationToken cancellationToken)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        var userId = await _authService.RegisterAsync(dto);
+        var userId = await _authService.RegisterAsync(dto, cancellationToken);
         if (userId is null)
-            return Conflict("Email already in use.");
+        {
+            return Conflict(new ProblemDetails
+            {
+                Status = StatusCodes.Status409Conflict,
+                Title = "Email already in use."
+            });
+        }
 
-        return Ok(new { UserId = userId, Message = "User registered successfully." });
+        return StatusCode(
+            StatusCodes.Status201Created,
+            new { UserId = userId, Message = "User registered successfully." });
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login(LoginDto dto)
+    public async Task<IActionResult> Login(LoginDto dto, CancellationToken cancellationToken)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        var response = await _authService.LoginAsync(dto);
+        var response = await _authService.LoginAsync(dto, cancellationToken);
         if (response is null)
-            return Unauthorized("Invalid credentials.");
+        {
+            return Unauthorized(new ProblemDetails
+            {
+                Status = StatusCodes.Status401Unauthorized,
+                Title = "Invalid credentials."
+            });
+        }
 
         return Ok(response);
     }

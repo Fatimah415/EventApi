@@ -20,11 +20,11 @@ public class CreateEventDto
     public string Location { get; set; } = string.Empty;
 
     // Which category this event belongs to (FK -> Category).
-    [Required]
+    [Range(1, int.MaxValue)]
     public int CategoryId { get; set; }
 
-    // Temporary bridge until Phase 3 (JWT) supplies the owner from the token.
-    [Required]
+    // The admin explicitly chooses the event organizer.
+    [Range(1, int.MaxValue)]
     public int UserId { get; set; }
 }
 
@@ -45,7 +45,7 @@ public class UpdateEventDto
     [MaxLength(200)]
     public string Location { get; set; } = string.Empty;
 
-    [Required]
+    [Range(1, int.MaxValue)]
     public int CategoryId { get; set; }
 }
 

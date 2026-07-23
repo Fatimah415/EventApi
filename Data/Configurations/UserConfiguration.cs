@@ -30,7 +30,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         // Seed users. Password hashes are pre-computed BCrypt (work factor 11)
         // constants — HasData must be deterministic, so we cannot hash at
-        // runtime. Plain passwords: Admin@123 / Sara@123 / Bilal@123.
+        // runtime. Register and promote a local account for authentication demos.
         builder.HasData(
             new User
             {

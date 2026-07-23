@@ -4,10 +4,11 @@ namespace EventApi.Repositories;
 
 public interface IEventRepository
 {
-    Task<IEnumerable<Event>> GetAllAsync();
-    Task<Event?> GetByIdAsync(int id);
-    Task<Event> AddAsync(Event ev);
-    Task UpdateAsync(Event ev);
-    Task DeleteAsync(Event ev);
-    Task<bool> UserExistsAsync(int userId);
+    Task<IEnumerable<Event>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<Event?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
+    Task<Event> AddAsync(Event ev, CancellationToken cancellationToken = default);
+    Task UpdateAsync(Event ev, CancellationToken cancellationToken = default);
+    Task DeleteAsync(Event ev, CancellationToken cancellationToken = default);
+    Task<bool> UserExistsAsync(int userId, CancellationToken cancellationToken = default);
+    Task<bool> CategoryExistsAsync(int categoryId, CancellationToken cancellationToken = default);
 }

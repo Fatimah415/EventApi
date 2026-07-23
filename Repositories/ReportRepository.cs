@@ -5,7 +5,9 @@ namespace EventApi.Repositories;
 
 public interface IReportRepository
 {
-    Task<IEnumerable<BookingsPerEventDto>> GetBookingsPerEventAsync(BookingStatus? status = null);
+    Task<IReadOnlyList<BookingsPerEventDto>> GetBookingsPerEventAsync(
+        BookingStatus? status = null,
+        CancellationToken cancellationToken = default);
 }
 
 /// <summary>
@@ -29,7 +31,9 @@ public class ReportRepository : IReportRepository
     /// as a SqlParameter — never string-concatenated — so the query is safe from
     /// SQL injection.
     /// </summary>
-    public async Task<IEnumerable<BookingsPerEventDto>> GetBookingsPerEventAsync(BookingStatus? status = null)
+    public async Task<IReadOnlyList<BookingsPerEventDto>> GetBookingsPerEventAsync(
+        BookingStatus? status = null,
+        CancellationToken cancellationToken = default)
     {
         const string sql = @"
             SELECT e.Id AS EventId,
@@ -56,10 +60,10 @@ public class ReportRepository : IReportRepository
             Value = status.HasValue ? status.Value.ToString() : DBNull.Value
         });
 
-        await connection.OpenAsync();
+        await connection.OpenAsync(cancellationToken);
 
-        await using var reader = await command.ExecuteReaderAsync();
-        while (await reader.ReadAsync())
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+        while (await reader.ReadAsync(cancellationToken))
         {
             results.Add(new BookingsPerEventDto
             {

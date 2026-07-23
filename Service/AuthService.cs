@@ -14,27 +14,37 @@ public class AuthService : IAuthService
         _jwtTokenService = jwtTokenService;
     }
 
-    public async Task<int?> RegisterAsync(RegisterDto dto)
+    public async Task<int?> RegisterAsync(
+        RegisterDto dto,
+        CancellationToken cancellationToken = default)
     {
-        if (await _userRepository.UserExistsAsync(dto.Email))
+        ArgumentNullException.ThrowIfNull(dto);
+
+        var normalizedEmail = dto.Email.Trim().ToLowerInvariant();
+        if (await _userRepository.UserExistsAsync(normalizedEmail, cancellationToken))
             return null;
 
         var user = new User
         {
-            Name = dto.Name,
-            Email = dto.Email,
+            Name = dto.Name.Trim(),
+            Email = normalizedEmail,
             // Never store the plaintext password — hash it with BCrypt.
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
             Role = Roles.User
         };
 
-        await _userRepository.AddUserAsync(user);
+        await _userRepository.AddUserAsync(user, cancellationToken);
         return user.Id;
     }
 
-    public async Task<LoginResponseDto?> LoginAsync(LoginDto dto)
+    public async Task<LoginResponseDto?> LoginAsync(
+        LoginDto dto,
+        CancellationToken cancellationToken = default)
     {
-        var user = await _userRepository.GetByEmailAsync(dto.Email);
+        ArgumentNullException.ThrowIfNull(dto);
+
+        var normalizedEmail = dto.Email.Trim().ToLowerInvariant();
+        var user = await _userRepository.GetByEmailAsync(normalizedEmail, cancellationToken);
 
         // Same null result for unknown email and wrong password so the
         // response never reveals which one was incorrect.

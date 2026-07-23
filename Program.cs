@@ -19,13 +19,11 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
 // EF Core DbContext (SQL Server / LocalDB). Registered as Scoped by default.
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("ConnectionStrings:DefaultConnection is not configured.");
 
-// Scoped (one instance per HTTP request): a service that depends on the
-// Scoped DbContext must NOT be a Singleton, or DI throws a captive-dependency
-// error ("Cannot consume scoped service from singleton").
-builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(connectionString));
 
 // Events feature: repository + service.
 builder.Services.AddScoped<IEventRepository, EventRepository>();
@@ -38,8 +36,20 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Reporting: raw ADO.NET repository.
 builder.Services.AddScoped<IReportRepository, ReportRepository>();
+builder.Services.AddScoped<IReportService, ReportService>();
 
 // JWT Bearer authentication: validates the Authorization header on every request.
+var jwtKey = builder.Configuration["Jwt:Key"]
+    ?? throw new InvalidOperationException(
+        "Jwt:Key is not configured. Use .NET User Secrets or the Jwt__Key environment variable.");
+var jwtIssuer = builder.Configuration["Jwt:Issuer"]
+    ?? throw new InvalidOperationException("Jwt:Issuer is not configured.");
+var jwtAudience = builder.Configuration["Jwt:Audience"]
+    ?? throw new InvalidOperationException("Jwt:Audience is not configured.");
+
+if (Encoding.UTF8.GetByteCount(jwtKey) < 32)
+    throw new InvalidOperationException("Jwt:Key must be at least 32 bytes for HS256.");
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -49,11 +59,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
+            ValidIssuer = jwtIssuer,
+            ValidAudience = jwtAudience,
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]
-                    ?? throw new InvalidOperationException("Jwt:Key is not configured.")))
+                Encoding.UTF8.GetBytes(jwtKey)),
+            ValidAlgorithms = new[] { SecurityAlgorithms.HmacSha256 },
+            ClockSkew = TimeSpan.FromMinutes(1)
         };
     });
 

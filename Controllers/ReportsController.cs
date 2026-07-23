@@ -1,5 +1,5 @@
 using EventApi.Models;
-using EventApi.Repositories;
+using EventApi.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EventApi.Controllers;
@@ -8,11 +8,11 @@ namespace EventApi.Controllers;
 [Route("api/[controller]")]
 public class ReportsController : ControllerBase
 {
-    private readonly IReportRepository _reportRepository;
+    private readonly IReportService _reportService;
 
-    public ReportsController(IReportRepository reportRepository)
+    public ReportsController(IReportService reportService)
     {
-        _reportRepository = reportRepository;
+        _reportService = reportService;
     }
 
     /// <summary>
@@ -20,9 +20,11 @@ public class ReportsController : ControllerBase
     /// GET /api/reports/bookings-per-event?status=Confirmed
     /// </summary>
     [HttpGet("bookings-per-event")]
-    public async Task<IActionResult> GetBookingsPerEvent([FromQuery] BookingStatus? status = null)
+    public async Task<IActionResult> GetBookingsPerEvent(
+        [FromQuery] BookingStatus? status,
+        CancellationToken cancellationToken)
     {
-        var report = await _reportRepository.GetBookingsPerEventAsync(status);
+        var report = await _reportService.GetBookingsPerEventAsync(status, cancellationToken);
         return Ok(report);
     }
 }

@@ -5,8 +5,8 @@ namespace EventApi.Services;
 public interface IAuthService
 {
     // Returns the new user's Id, or null when the email is already registered.
-    Task<int?> RegisterAsync(RegisterDto dto);
+    Task<int?> RegisterAsync(RegisterDto dto, CancellationToken cancellationToken = default);
 
     // Returns a token response, or null when the credentials are invalid.
-    Task<LoginResponseDto?> LoginAsync(LoginDto dto);
+    Task<LoginResponseDto?> LoginAsync(LoginDto dto, CancellationToken cancellationToken = default);
 }
