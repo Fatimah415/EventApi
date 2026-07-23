@@ -37,4 +37,3 @@ public class Event
     // Server-set on creation; never supplied by the client.
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }
-

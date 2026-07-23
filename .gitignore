@@ -480,3 +480,8 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Local generated folders
+/.codex-build/
+/output/
+/wwwroot/uploads/
