@@ -1,0 +1,10 @@
+{
+  "available": true,
+  "message": null,
+  "city": "Lahore",
+  "temperatureCelsius": 32,
+  "feelsLikeCelsius": 34,
+  "humidity": 41,
+  "description": "clear sky",
+  "windSpeedMetersPerSec": 2.6
+}

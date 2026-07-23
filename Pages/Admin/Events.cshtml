@@ -1,0 +1,87 @@
+@page "/Admin/Events"
+@model EventApi.Pages.Admin.EventsModel
+@{
+    ViewData["Title"] = "Events";
+    ViewData["ActivePage"] = "Events";
+    Layout = "/Pages/Shared/_AdminLayout.cshtml";
+}
+
+@if (Model.ErrorMessage != null)
+{
+    <div class="alert alert-error">@Model.ErrorMessage</div>
+}
+
+<div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div class="card-title" style="margin-bottom:0;">All Events (@Model.Events.Count() total)</div>
+        <a href="/Admin/Events/Create" class="btn" style="background:#6c63ff; color:white;">+ Create Event</a>
+    </div>
+    <br/>
+    <input class="search-box" type="text" id="searchInput" placeholder="Search events by title or location…" oninput="filterTable()" />
+
+    @if (Model.Events.Any())
+    {
+        <table id="eventsTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Location</th>
+                    <th>Date</th>
+                    <th>Owner ID</th>
+                    <th>Created</th>
+                    <th>Image</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var ev in Model.Events)
+            {
+                <tr>
+                    <td>@ev.Id</td>
+                    <td><strong>@ev.Title</strong></td>
+                    <td>@ev.CategoryName</td>
+                    <td>@ev.Location</td>
+                    <td>@ev.EventDate.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>@ev.UserId</td>
+                    <td>@ev.CreatedAt.ToString("yyyy-MM-dd")</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(ev.ImagePath))
+                        {
+                            <a href="@ev.ImagePath" target="_blank">View</a>
+                        }
+                        else
+                        {
+                            <span style="color:#a0aec0">—</span>
+                        }
+                    </td>
+                    <td style="display:flex; gap:6px;">
+                        <a href="/Admin/Events/Edit/@ev.Id" class="btn" style="background:#ebf4ff; color:#2b6cb0; border:1px solid #bee3f8;">Edit</a>
+                        <form class="delete-form" method="post" asp-page-handler="Delete" asp-route-id="@ev.Id"
+                              onsubmit="return confirm('Delete event @ev.Id?')">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="empty-state">No events found.</div>
+    }
+</div>
+
+@section Scripts {
+<script>
+function filterTable() {
+    var q = document.getElementById('searchInput').value.toLowerCase();
+    document.querySelectorAll('#eventsTable tbody tr').forEach(function(row) {
+        row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+}
+</script>
+}
