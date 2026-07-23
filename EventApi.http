@@ -1,6 +1,64 @@
 @EventApi_HostAddress = http://localhost:5289
+@adminToken = paste-admin-jwt-here
 
-GET {{EventApi_HostAddress}}/weatherforecast/
+### Register a regular user
+POST {{EventApi_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Test User",
+  "email": "test@eventboard.com",
+  "password": "Secret123!"
+}
+
+### Login
+POST {{EventApi_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@eventboard.com",
+  "password": "Secret123!"
+}
+
+### Get all events (public)
+GET {{EventApi_HostAddress}}/api/events
 Accept: application/json
 
-###
+### Get event by id (public)
+GET {{EventApi_HostAddress}}/api/events/1
+Accept: application/json
+
+### Bookings per event report, filtered by indexed Status (public)
+GET {{EventApi_HostAddress}}/api/reports/bookings-per-event?status=Confirmed
+Accept: application/json
+
+### Create an event (Admin role required)
+POST {{EventApi_HostAddress}}/api/events
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "title": "Tech Meetup",
+  "description": "Intro to .NET",
+  "eventDate": "2026-10-01T18:00:00Z",
+  "location": "Lahore",
+  "categoryId": 1,
+  "userId": 1
+}
+
+### Update an event (Admin role required)
+PUT {{EventApi_HostAddress}}/api/events/1
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "title": "Tech Meetup (updated)",
+  "description": "Updated description",
+  "eventDate": "2026-10-02T18:00:00Z",
+  "location": "Karachi",
+  "categoryId": 1
+}
+
+### Delete an event (Admin role required)
+DELETE {{EventApi_HostAddress}}/api/events/1
+Authorization: Bearer {{adminToken}}
