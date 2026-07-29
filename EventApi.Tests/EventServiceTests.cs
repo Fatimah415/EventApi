@@ -1,6 +1,7 @@
 using EventApi.Models;
 using EventApi.Repositories;
 using EventApi.Services;
+using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -44,9 +45,9 @@ public class EventServiceTests
         var result = await _sut.GetAllAsync();
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Equal(2, result.Count());
-        Assert.Equal("Event 1", result.First().Title);
+        result.Should().NotBeNull();
+        result.Should().HaveCount(2);
+        result.First().Title.Should().Be("Event 1");
     }
 
     // ---------------------------------------------------------
@@ -63,9 +64,8 @@ public class EventServiceTests
         var result = await _sut.GetByIdAsync(1);
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Equal(1, result.Id);
-        Assert.Equal("Event 1", result.Title);
+        result.Should().NotBeNull();
+        result!.Should().BeEquivalentTo(new { Id = 1, Title = "Event 1" });
     }
 
     [Fact]
@@ -78,7 +78,7 @@ public class EventServiceTests
         var result = await _sut.GetByIdAsync(1);
 
         // Assert
-        Assert.Null(result);
+        result.Should().BeNull();
     }
 
     // ---------------------------------------------------------
@@ -95,7 +95,7 @@ public class EventServiceTests
         var result = await _sut.CreateAsync(dto);
 
         // Assert
-        Assert.Null(result);
+        result.Should().BeNull();
         _repositoryMock.Verify(repo => repo.AddAsync(It.IsAny<Event>()), Times.Never);
     }
 
@@ -110,9 +110,9 @@ public class EventServiceTests
         var result = await _sut.CreateAsync(dto);
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Equal("Test", result.Title);
-        Assert.Null(result.ImagePath);
+        result.Should().NotBeNull();
+        result!.Title.Should().Be("Test");
+        result.ImagePath.Should().BeNull();
         
         _fileServiceMock.Verify(fs => fs.SaveImageAsync(It.IsAny<IFormFile>()), Times.Never);
         _repositoryMock.Verify(repo => repo.AddAsync(It.Is<Event>(e => e.Title == "Test")), Times.Once);
@@ -132,8 +132,8 @@ public class EventServiceTests
         var result = await _sut.CreateAsync(dto);
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Equal("image.jpg", result.ImagePath);
+        result.Should().NotBeNull();
+        result!.ImagePath.Should().Be("image.jpg");
         
         _fileServiceMock.Verify(fs => fs.SaveImageAsync(mockFile.Object), Times.Once);
         _repositoryMock.Verify(repo => repo.AddAsync(It.Is<Event>(e => e.ImagePath == "image.jpg")), Times.Once);
@@ -151,7 +151,9 @@ public class EventServiceTests
         _repositoryMock.Setup(repo => repo.AddAsync(It.IsAny<Event>())).ThrowsAsync(new Exception("DB Error"));
 
         // Act & Assert
-        await Assert.ThrowsAsync<Exception>(() => _sut.CreateAsync(dto));
+        Func<Task> action = () => _sut.CreateAsync(dto);
+
+        await action.Should().ThrowAsync<Exception>().WithMessage("DB Error");
         
         _fileServiceMock.Verify(fs => fs.SaveImageAsync(mockFile.Object), Times.Once);
         _fileServiceMock.Verify(fs => fs.DeleteImageAsync("image.jpg"), Times.Once);
@@ -170,7 +172,7 @@ public class EventServiceTests
         var result = await _sut.UpdateAsync(1, ValidUpdateDto());
 
         // Assert
-        Assert.False(result);
+        result.Should().BeFalse();
         _repositoryMock.Verify(repo => repo.UpdateAsync(It.IsAny<Event>()), Times.Never);
     }
 
@@ -187,9 +189,9 @@ public class EventServiceTests
         var result = await _sut.UpdateAsync(1, dto);
 
         // Assert
-        Assert.True(result);
-        Assert.Equal("New", existing.Title);
-        Assert.Equal("old.jpg", existing.ImagePath); // Preserved
+        result.Should().BeTrue();
+        existing.Title.Should().Be("New");
+        existing.ImagePath.Should().Be("old.jpg"); // Preserved
         
         _repositoryMock.Verify(repo => repo.UpdateAsync(existing), Times.Once);
         _fileServiceMock.Verify(fs => fs.SaveImageAsync(It.IsAny<IFormFile>()), Times.Never);
@@ -211,9 +213,9 @@ public class EventServiceTests
         var result = await _sut.UpdateAsync(1, dto);
 
         // Assert
-        Assert.True(result);
-        Assert.Equal("New", existing.Title);
-        Assert.Equal("new.jpg", existing.ImagePath);
+        result.Should().BeTrue();
+        existing.Title.Should().Be("New");
+        existing.ImagePath.Should().Be("new.jpg");
         
         _fileServiceMock.Verify(fs => fs.SaveImageAsync(mockFile.Object), Times.Once);
         _repositoryMock.Verify(repo => repo.UpdateAsync(existing), Times.Once);
@@ -233,7 +235,9 @@ public class EventServiceTests
         _repositoryMock.Setup(repo => repo.UpdateAsync(existing)).ThrowsAsync(new Exception("DB Error"));
 
         // Act & Assert
-        await Assert.ThrowsAsync<Exception>(() => _sut.UpdateAsync(1, dto));
+        Func<Task> action = () => _sut.UpdateAsync(1, dto);
+
+        await action.Should().ThrowAsync<Exception>().WithMessage("DB Error");
         
         _fileServiceMock.Verify(fs => fs.SaveImageAsync(mockFile.Object), Times.Once);
         _fileServiceMock.Verify(fs => fs.DeleteImageAsync("new.jpg"), Times.Once); // The newly saved image
@@ -253,7 +257,7 @@ public class EventServiceTests
         var result = await _sut.DeleteAsync(1);
 
         // Assert
-        Assert.False(result);
+        result.Should().BeFalse();
         _repositoryMock.Verify(repo => repo.DeleteAsync(It.IsAny<Event>()), Times.Never);
     }
 
@@ -268,7 +272,7 @@ public class EventServiceTests
         var result = await _sut.DeleteAsync(1);
 
         // Assert
-        Assert.True(result);
+        result.Should().BeTrue();
         _repositoryMock.Verify(repo => repo.DeleteAsync(existing), Times.Once);
         _fileServiceMock.Verify(fs => fs.DeleteImageAsync(It.IsAny<string>()), Times.Never);
     }
@@ -284,7 +288,7 @@ public class EventServiceTests
         var result = await _sut.DeleteAsync(1);
 
         // Assert
-        Assert.True(result);
+        result.Should().BeTrue();
         _repositoryMock.Verify(repo => repo.DeleteAsync(existing), Times.Once);
         _fileServiceMock.Verify(fs => fs.DeleteImageAsync("image.jpg"), Times.Once);
     }
@@ -294,14 +298,18 @@ public class EventServiceTests
     [InlineData(-1)]
     public async Task GetByIdAsync_InvalidId_ThrowsArgumentException(int id)
     {
-        await Assert.ThrowsAsync<ArgumentException>(() => _sut.GetByIdAsync(id));
+        Func<Task> action = () => _sut.GetByIdAsync(id);
+
+        await action.Should().ThrowAsync<ArgumentException>();
         _repositoryMock.Verify(repo => repo.GetByIdAsync(It.IsAny<int>()), Times.Never);
     }
 
     [Fact]
     public async Task CreateAsync_NullDto_ThrowsArgumentNullException()
     {
-        await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.CreateAsync(null!));
+        Func<Task> action = () => _sut.CreateAsync(null!);
+
+        await action.Should().ThrowAsync<ArgumentNullException>();
         _repositoryMock.Verify(repo => repo.UserExistsAsync(It.IsAny<int>()), Times.Never);
     }
 
@@ -313,7 +321,9 @@ public class EventServiceTests
         var dto = ValidCreateDto();
         dto.Title = title;
 
-        await Assert.ThrowsAsync<ArgumentException>(() => _sut.CreateAsync(dto));
+        Func<Task> action = () => _sut.CreateAsync(dto);
+
+        await action.Should().ThrowAsync<ArgumentException>();
         _repositoryMock.Verify(repo => repo.UserExistsAsync(It.IsAny<int>()), Times.Never);
     }
 
@@ -331,14 +341,18 @@ public class EventServiceTests
         dto.Location = location;
         dto.CategoryId = categoryId;
 
-        await Assert.ThrowsAsync<ArgumentException>(() => _sut.CreateAsync(dto));
+        Func<Task> action = () => _sut.CreateAsync(dto);
+
+        await action.Should().ThrowAsync<ArgumentException>();
         _repositoryMock.Verify(repo => repo.UserExistsAsync(It.IsAny<int>()), Times.Never);
     }
 
     [Fact]
     public async Task UpdateAsync_NullDto_ThrowsArgumentNullException()
     {
-        await Assert.ThrowsAsync<ArgumentNullException>(() => _sut.UpdateAsync(1, null!));
+        Func<Task> action = () => _sut.UpdateAsync(1, null!);
+
+        await action.Should().ThrowAsync<ArgumentNullException>();
         _repositoryMock.Verify(repo => repo.GetByIdAsync(It.IsAny<int>()), Times.Never);
     }
 
@@ -353,7 +367,7 @@ public class EventServiceTests
 
         var result = await _sut.UpdateAsync(1, ValidUpdateDto(mockFile.Object));
 
-        Assert.True(result);
+        result.Should().BeTrue();
         _loggerMock.VerifyLog(LogLevel.Warning, Times.Once());
     }
 
@@ -366,7 +380,7 @@ public class EventServiceTests
 
         var result = await _sut.DeleteAsync(1);
 
-        Assert.True(result);
+        result.Should().BeTrue();
         _loggerMock.VerifyLog(LogLevel.Warning, Times.Once());
     }
 

@@ -1,4 +1,5 @@
 using EventApi.Services;
+using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Moq;
@@ -64,8 +65,8 @@ public class FileServiceTests : IDisposable
         var result = await _fileService.SaveImageAsync(file);
 
         // Assert
-        Assert.StartsWith("/uploads/", result);
-        Assert.EndsWith(".jpg", result);
+        result.Should().StartWith("/uploads/");
+        result.Should().EndWith(".jpg");
 
         var fileName = Path.GetFileName(result);
         var savedFilePath = Path.Combine(
@@ -73,7 +74,7 @@ public class FileServiceTests : IDisposable
             "uploads",
             fileName);
 
-        Assert.True(File.Exists(savedFilePath));
+        File.Exists(savedFilePath).Should().BeTrue();
     }
 
     [Fact]
@@ -95,13 +96,13 @@ public class FileServiceTests : IDisposable
             _testWebRoot,
             "uploads");
 
-        Assert.False(Directory.Exists(uploadsFolder));
+        Directory.Exists(uploadsFolder).Should().BeFalse();
 
         // Act
         await _fileService.SaveImageAsync(file);
 
         // Assert
-        Assert.True(Directory.Exists(uploadsFolder));
+        Directory.Exists(uploadsFolder).Should().BeTrue();
     }
 
     [Fact]
@@ -118,10 +119,11 @@ public class FileServiceTests : IDisposable
             .Returns((false, "Invalid file."));
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<ArgumentException>(
-            () => _fileService.SaveImageAsync(file));
+        Func<Task> action = () => _fileService.SaveImageAsync(file);
 
-        Assert.Equal("Invalid file.", exception.Message);
+        await action.Should()
+            .ThrowAsync<ArgumentException>()
+            .WithMessage("Invalid file.");
     }
 
     [Fact]
@@ -141,7 +143,7 @@ public class FileServiceTests : IDisposable
         var result = await _fileService.SaveImageAsync(file);
 
         // Assert
-        Assert.EndsWith(".png", result);
+        result.Should().EndWith(".png");
     }
 
     // ============================================================
@@ -151,31 +153,31 @@ public class FileServiceTests : IDisposable
     [Fact]
     public async Task DeleteImageAsync_NullPath_DoesNothing()
     {
-        // Act
+        var uploadsFolder = Path.Combine(_testWebRoot, "uploads");
+
         await _fileService.DeleteImageAsync(null);
 
-        // Assert
-        Assert.True(true);
+        Directory.Exists(uploadsFolder).Should().BeFalse();
     }
 
     [Fact]
     public async Task DeleteImageAsync_EmptyPath_DoesNothing()
     {
-        // Act
+        var uploadsFolder = Path.Combine(_testWebRoot, "uploads");
+
         await _fileService.DeleteImageAsync("");
 
-        // Assert
-        Assert.True(true);
+        Directory.Exists(uploadsFolder).Should().BeFalse();
     }
 
     [Fact]
     public async Task DeleteImageAsync_WhitespacePath_DoesNothing()
     {
-        // Act
+        var uploadsFolder = Path.Combine(_testWebRoot, "uploads");
+
         await _fileService.DeleteImageAsync("   ");
 
-        // Assert
-        Assert.True(true);
+        Directory.Exists(uploadsFolder).Should().BeFalse();
     }
 
     [Fact]
@@ -202,27 +204,27 @@ public class FileServiceTests : IDisposable
             $"/uploads/{fileName}");
 
         // Assert
-        Assert.False(File.Exists(filePath));
+        File.Exists(filePath).Should().BeFalse();
     }
 
     [Fact]
     public async Task DeleteImageAsync_FileDoesNotExist_DoesNothing()
     {
-        // Act
+        var uploadsFolder = Path.Combine(_testWebRoot, "uploads");
+
         await _fileService.DeleteImageAsync(
             "/uploads/missing.jpg");
 
-        // Assert
-        Assert.True(true);
+        Directory.Exists(uploadsFolder).Should().BeFalse();
     }
 
     [Fact]
     public async Task DeleteImageAsync_PathTraversal_ThrowsInvalidOperationException()
     {
-        // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(
-            () => _fileService.DeleteImageAsync(
-                "/uploads/../../secret.txt"));
+        Func<Task> action = () => _fileService.DeleteImageAsync(
+            "/uploads/../../secret.txt");
+
+        await action.Should().ThrowAsync<InvalidOperationException>();
     }
 
     // ============================================================

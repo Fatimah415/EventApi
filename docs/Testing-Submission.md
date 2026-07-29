@@ -8,25 +8,33 @@ Write unit and integration tests for at least two services, achieving greater th
 
 | Evidence | Result |
 |---|---:|
-| Test run | 63 passed, 0 failed, 0 skipped |
+| Test run | 78 passed, 0 failed, 0 skipped |
 | EventService line coverage | 100% (141/141) |
-| FileService line coverage | 92.45% (49/53) |
-| Combined line coverage | 97.94% (190/194) |
-| Combined branch coverage | 94.12% (48/51) |
+| AdminService line coverage | 100% (29/29) |
+| Combined line coverage | 100% (170/170) |
+| Combined branch coverage | 100% (39/39) |
 | UAT scripts | 10 |
 
-Coverlet stores truncated rate values (`97.93%` and `94.11%`) in Cobertura XML. The table calculates the same covered/valid ratios and rounds them to two decimal places.
+These figures come from the mentor-required `EventService` + `AdminService` Coverlet profile. They do not claim whole-application coverage.
 
 ## Submission links and evidence
 
 - **Technical Loom video:** `[ADD TECHNICAL LOOM URL]`
 - **Non-technical UAT Loom video:** `[ADD NON-TECHNICAL UAT LOOM URL]`
-- **Test-branch pull request:** [Fatimah415/EventApi#2](https://github.com/Fatimah415/EventApi/pull/2)
+- **Prerequisite/base PR:** [Fatimah415/EventApi#2](https://github.com/Fatimah415/EventApi/pull/2)
+- **Mentor-remediation PR:** `[ADD MENTOR-REMEDIATION PR URL]`
 - **Coverage screenshot:** `docs/evidence/two-service-coverage.png`
 - **UAT plan:** `docs/UAT-Plan.md`
 - **AI testing prompts:** `docs/testing-ai-prompts.md`
 
-No placeholder above is a real URL. Replace each bracketed value only after the corresponding artifact exists.
+The two Loom placeholders and mentor-remediation PR placeholder are not real URLs. Replace each one only after the corresponding artifact exists.
+
+### Stacked PR scope
+
+- **Base:** `feature/ai-testing`
+- **Compare:** `feature/uat-testing`
+
+This stacked PR contains only the mentor-remediation changes. It does not target `main` and does not add the prerequisite Auth/DB, admin, file-upload, or other application changes to the remediation diff.
 
 ## Generate the final coverage report
 
@@ -56,6 +64,7 @@ The generated `TestResults` directory and raw `coverage.cobertura.xml` are ignor
 ### Test project
 
 - `EventApi.Tests/EventApi.Tests.csproj`
+- `EventApi.Tests/AdminServiceTests.cs`
 - `EventApi.Tests/EventServiceTests.cs`
 - `EventApi.Tests/FileServiceTests.cs`
 - `EventApi.Tests/FileValidatorTests.cs`
@@ -74,14 +83,7 @@ The generated `TestResults` directory and raw `coverage.cobertura.xml` are ignor
 - `docs/UAT-Plan.md`
 - `docs/evidence/two-service-coverage.png` after the screenshot is captured
 
-### Existing production dependencies
-
-The verified tests currently depend on already-present working-tree changes in:
-
-- `Service/EventService.cs`
-- `Service/FileService.cs`
-
-These files were not changed while preparing the remaining submission artifacts. They must be included in the test branch if those changes are not already present in the branch used as the PR base; otherwise the committed test results will not reproduce the audited run.
+`FileServiceTests.cs` and `FileValidatorTests.cs` are additional coverage. They are not a substitute for `AdminServiceTests.cs`.
 
 Do not commit `bin/`, `obj/`, `TestResults/`, uploaded files, `AGENTS.md`, the unused `TestDbContextFactory.cs`, or the superseded event-feature-only `coverlet.runsettings` as assignment evidence.
 
@@ -89,13 +91,15 @@ Do not commit `bin/`, `obj/`, `TestResults/`, uploaded files, `AGENTS.md`, the u
 
 | Deliverable | Status |
 |---|---|
-| Two meaningfully unit-tested services | COMPLETE |
+| EventService and AdminService meaningfully unit tested | COMPLETE |
 | Unit and integration test project | COMPLETE |
-| Combined line coverage greater than 80% | COMPLETE — 97.94% |
+| Combined line coverage greater than 80% | COMPLETE — 100% |
 | Dedicated two-service Coverlet profile | COMPLETE |
 | UAT plan with at least eight scripts | COMPLETE — 10 scripts |
-| Testing-specific AI prompt transcript | COMPLETE |
+| AI prompt evidence and method traceability | COMPLETE — 42/68 methods (61.76%) have stored remediation-prompt evidence |
+| Repository-owner human review confirmation | PENDING — owner must personally review and confirm three entries |
 | Coverage screenshot | COMPLETE |
-| Technical Loom video and URL | REMAINING |
-| Non-technical UAT Loom video and URL | REMAINING |
-| Test branch, PR, and real PR URL | COMPLETE |
+| Technical Loom video and genuine URL | PENDING |
+| Non-technical UAT Loom video and genuine URL | PENDING |
+| Assessment branch | COMPLETE — local `feature/uat-testing` worktree |
+| Commit, push, and PR containing this mentor remediation | PENDING |
