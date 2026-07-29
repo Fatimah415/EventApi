@@ -19,15 +19,15 @@ These figures come from the mentor-required `EventService` + `AdminService` Cove
 
 ## Submission links and evidence
 
-- **Technical Loom video:** `[ADD TECHNICAL LOOM URL]`
-- **Non-technical UAT Loom video:** `[ADD NON-TECHNICAL UAT LOOM URL]`
+- **Technical Loom video:** Submitted separately through the assessment portal; URL intentionally not stored in the repository.
+- **Non-technical UAT Loom video:** Submitted separately through the assessment portal; URL intentionally not stored in the repository.
 - **Prerequisite/base PR:** [Fatimah415/EventApi#2](https://github.com/Fatimah415/EventApi/pull/2)
-- **Mentor-remediation PR:** `[ADD MENTOR-REMEDIATION PR URL]`
+- **Mentor-remediation PR:** [Fatimah415/EventApi#5](https://github.com/Fatimah415/EventApi/pull/5)
 - **Coverage screenshot:** `docs/evidence/two-service-coverage.png`
 - **UAT plan:** `docs/UAT-Plan.md`
 - **AI testing prompts:** `docs/testing-ai-prompts.md`
 
-The two Loom placeholders and mentor-remediation PR placeholder are not real URLs. Replace each one only after the corresponding artifact exists.
+The two genuine Loom URLs are submitted directly in the assessment portal and are intentionally not duplicated in this repository. Both pull-request links above are real.
 
 ### Stacked PR scope
 
@@ -97,9 +97,9 @@ Do not commit `bin/`, `obj/`, `TestResults/`, uploaded files, `AGENTS.md`, the u
 | Dedicated two-service Coverlet profile | COMPLETE |
 | UAT plan with at least eight scripts | COMPLETE — 10 scripts |
 | AI prompt evidence and method traceability | COMPLETE — 42/68 methods (61.76%) have stored remediation-prompt evidence |
-| Repository-owner human review confirmation | PENDING — owner must personally review and confirm three entries |
+| Repository-owner human review confirmation | COMPLETE — owner confirmed all three prompt-evidenced test files on 29 July 2026 |
 | Coverage screenshot | COMPLETE |
-| Technical Loom video and genuine URL | PENDING |
-| Non-technical UAT Loom video and genuine URL | PENDING |
+| Technical Loom video and genuine URL | EXTERNAL SUBMISSION — add in assessment portal |
+| Non-technical UAT Loom video and genuine URL | EXTERNAL SUBMISSION — add in assessment portal |
 | Assessment branch | COMPLETE — local `feature/uat-testing` worktree |
-| Commit, push, and PR containing this mentor remediation | PENDING |
+| Commit, push, and PR containing this mentor remediation | COMPLETE — PR #5 |
