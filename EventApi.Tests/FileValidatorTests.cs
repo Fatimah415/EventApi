@@ -1,4 +1,5 @@
 using EventApi.Services;
+using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 
 namespace EventApi.Tests;
@@ -14,8 +15,8 @@ public class FileValidatorTests
         var result = _validator.ValidateImage(null);
 
         // Assert
-        Assert.False(result.IsValid);
-        Assert.Equal("File is empty or not provided.", result.ErrorMessage);
+        result.IsValid.Should().BeFalse();
+        result.ErrorMessage.Should().Be("File is empty or not provided.");
     }
 
     [Fact]
@@ -31,8 +32,8 @@ public class FileValidatorTests
         var result = _validator.ValidateImage(file);
 
         // Assert
-        Assert.False(result.IsValid);
-        Assert.Equal("File is empty or not provided.", result.ErrorMessage);
+        result.IsValid.Should().BeFalse();
+        result.ErrorMessage.Should().Be("File is empty or not provided.");
     }
 
     [Fact]
@@ -50,8 +51,8 @@ public class FileValidatorTests
         var result = _validator.ValidateImage(file);
 
         // Assert
-        Assert.False(result.IsValid);
-        Assert.Contains("File size exceeds", result.ErrorMessage);
+        result.IsValid.Should().BeFalse();
+        result.ErrorMessage.Should().Contain("File size exceeds");
     }
 
     [Fact]
@@ -67,8 +68,8 @@ public class FileValidatorTests
         var result = _validator.ValidateImage(file);
 
         // Assert
-        Assert.False(result.IsValid);
-        Assert.Contains("Invalid file extension", result.ErrorMessage);
+        result.IsValid.Should().BeFalse();
+        result.ErrorMessage.Should().Contain("Invalid file extension");
     }
 
     [Fact]
@@ -89,8 +90,8 @@ public class FileValidatorTests
         var result = _validator.ValidateImage(file);
 
         // Assert
-        Assert.False(result.IsValid);
-        Assert.Contains("Invalid MIME type", result.ErrorMessage);
+        result.IsValid.Should().BeFalse();
+        result.ErrorMessage.Should().Contain("Invalid MIME type");
     }
 
     [Fact]
@@ -111,8 +112,8 @@ public class FileValidatorTests
         var result = _validator.ValidateImage(file);
 
         // Assert
-        Assert.False(result.IsValid);
-        Assert.Contains("magic bytes", result.ErrorMessage);
+        result.IsValid.Should().BeFalse();
+        result.ErrorMessage.Should().Contain("magic bytes");
     }
 
     [Fact]
@@ -133,8 +134,8 @@ public class FileValidatorTests
         var result = _validator.ValidateImage(file);
 
         // Assert
-        Assert.True(result.IsValid);
-        Assert.Empty(result.ErrorMessage);
+        result.IsValid.Should().BeTrue();
+        result.ErrorMessage.Should().BeEmpty();
     }
 
     [Fact]
@@ -155,8 +156,8 @@ public class FileValidatorTests
         var result = _validator.ValidateImage(file);
 
         // Assert
-        Assert.True(result.IsValid);
-        Assert.Empty(result.ErrorMessage);
+        result.IsValid.Should().BeTrue();
+        result.ErrorMessage.Should().BeEmpty();
     }
 
     [Fact]
@@ -178,8 +179,8 @@ public class FileValidatorTests
         var result = _validator.ValidateImage(file);
 
         // Assert
-        Assert.True(result.IsValid);
-        Assert.Empty(result.ErrorMessage);
+        result.IsValid.Should().BeTrue();
+        result.ErrorMessage.Should().BeEmpty();
     }
 
     private static IFormFile CreateFormFile(

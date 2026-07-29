@@ -5,9 +5,10 @@
       <DataCollector friendlyName="XPlat Code Coverage">
         <Configuration>
           <Format>cobertura</Format>
-          <!-- Assignment scope: exactly the two services assessed. The trailing
-               wildcard includes their compiler-generated async state machines. -->
-          <Include>[EventApi]EventApi.Services.EventService*,[EventApi]EventApi.Services.FileService*</Include>
+          <!-- Mentor-required assignment scope: exactly EventService and
+               AdminService. The trailing wildcard includes compiler-generated
+               async state machines for both services. -->
+          <Include>[EventApi]EventApi.Services.EventService*,[EventApi]EventApi.Services.AdminService*</Include>
           <ExcludeByAttribute>GeneratedCodeAttribute,ExcludeFromCodeCoverageAttribute</ExcludeByAttribute>
           <SingleHit>false</SingleHit>
           <UseSourceLink>false</UseSourceLink>

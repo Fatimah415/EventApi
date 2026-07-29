@@ -7,6 +7,7 @@ using System.Text;
 using EventApi.Data;
 using EventApi.Models;
 using EventApi.Tests.Infrastructure;
+using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -41,12 +42,13 @@ public class EventsControllerIntegrationTests : IDisposable
     {
         var response = await _client.GetAsync("/api/Events");
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
         var events = await response.Content.ReadFromJsonAsync<List<EventResponseDto>>();
-        Assert.NotNull(events);
-        Assert.True(events.Count >= 10);
-        Assert.Equal(events.OrderBy(item => item.EventDate).Select(item => item.Id), events.Select(item => item.Id));
-        Assert.All(events, item => Assert.False(string.IsNullOrWhiteSpace(item.CategoryName)));
+        events.Should().NotBeNull();
+        events!.Should().HaveCountGreaterThanOrEqualTo(10);
+        events.Select(item => item.Id).Should()
+            .Equal(events.OrderBy(item => item.EventDate).Select(item => item.Id));
+        events.Should().OnlyContain(item => !string.IsNullOrWhiteSpace(item.CategoryName));
     }
 
     [Fact]
@@ -54,12 +56,15 @@ public class EventsControllerIntegrationTests : IDisposable
     {
         var response = await _client.GetAsync("/api/Events/1");
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
         var ev = await response.Content.ReadFromJsonAsync<EventResponseDto>();
-        Assert.NotNull(ev);
-        Assert.Equal(1, ev.Id);
-        Assert.Equal(".NET Conf 2026", ev.Title);
-        Assert.Equal("Conference", ev.CategoryName);
+        ev.Should().NotBeNull();
+        ev!.Should().BeEquivalentTo(new
+        {
+            Id = 1,
+            Title = ".NET Conf 2026",
+            CategoryName = "Conference"
+        });
     }
 
     [Fact]
@@ -67,8 +72,8 @@ public class EventsControllerIntegrationTests : IDisposable
     {
         var response = await _client.GetAsync("/api/Events/99999");
 
-        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-        Assert.Contains("not found", await response.Content.ReadAsStringAsync(), StringComparison.OrdinalIgnoreCase);
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        (await response.Content.ReadAsStringAsync()).Should().ContainEquivalentOf("not found");
     }
 
     [Fact]
@@ -76,7 +81,7 @@ public class EventsControllerIntegrationTests : IDisposable
     {
         var response = await _client.PostAsync("/api/Events", CreateValidForm());
 
-        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 
     [Fact]
@@ -86,7 +91,7 @@ public class EventsControllerIntegrationTests : IDisposable
 
         var response = await _client.PostAsync("/api/Events", CreateValidForm());
 
-        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]
@@ -101,7 +106,7 @@ public class EventsControllerIntegrationTests : IDisposable
 
         var response = await _client.PostAsync("/api/Events", form);
 
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]
@@ -111,18 +116,18 @@ public class EventsControllerIntegrationTests : IDisposable
 
         var response = await _client.PostAsync("/api/Events", CreateValidForm("Integration Created"));
 
-        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-        Assert.NotNull(response.Headers.Location);
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        response.Headers.Location.Should().NotBeNull();
         var created = await response.Content.ReadFromJsonAsync<EventResponseDto>();
-        Assert.NotNull(created);
-        Assert.Equal("Integration Created", created.Title);
-        Assert.EndsWith($"/{created.Id}", response.Headers.Location!.OriginalString);
+        created.Should().NotBeNull();
+        created!.Title.Should().Be("Integration Created");
+        response.Headers.Location!.OriginalString.Should().EndWith($"/{created.Id}");
 
         await using var scope = _factory.Services.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var persisted = await db.Events.AsNoTracking().SingleAsync(item => item.Id == created.Id);
-        Assert.Equal("Integration Created", persisted.Title);
-        Assert.Equal(1, persisted.UserId);
+        persisted.Title.Should().Be("Integration Created");
+        persisted.UserId.Should().Be(1);
     }
 
     [Fact]
@@ -132,13 +137,16 @@ public class EventsControllerIntegrationTests : IDisposable
 
         var response = await _client.PutAsync("/api/Events/1", CreateValidUpdateForm("Updated Conference"));
 
-        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
         await using var scope = _factory.Services.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var updated = await db.Events.AsNoTracking().SingleAsync(item => item.Id == 1);
-        Assert.Equal("Updated Conference", updated.Title);
-        Assert.Equal("Karachi", updated.Location);
-        Assert.Equal(2, updated.CategoryId);
+        updated.Should().BeEquivalentTo(new
+        {
+            Title = "Updated Conference",
+            Location = "Karachi",
+            CategoryId = 2
+        });
     }
 
     [Fact]
@@ -148,7 +156,7 @@ public class EventsControllerIntegrationTests : IDisposable
 
         var response = await _client.PutAsync("/api/Events/99999", CreateValidUpdateForm());
 
-        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]
@@ -158,10 +166,10 @@ public class EventsControllerIntegrationTests : IDisposable
 
         var response = await _client.DeleteAsync("/api/Events/1");
 
-        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
         await using var scope = _factory.Services.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        Assert.False(await db.Events.AnyAsync(item => item.Id == 1));
+        (await db.Events.AnyAsync(item => item.Id == 1)).Should().BeFalse();
     }
 
     [Fact]
@@ -171,7 +179,7 @@ public class EventsControllerIntegrationTests : IDisposable
 
         var response = await _client.DeleteAsync("/api/Events/99999");
 
-        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     private void AuthorizeAs(string role)

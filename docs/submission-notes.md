@@ -103,7 +103,14 @@ All exceptions are caught centrally (`IExceptionHandler`) and mapped to RFC 7807
 2. **No pagination** — all records loaded at once; acceptable for the dataset size.
 3. **No booking status update UI** — bookings are read-only in the admin panel; status changes would require a new booking service method.
 4. **Cookie auth for admin UI reuses JWT claims parsing** — not ideal for production; a dedicated cookie-only auth flow would be cleaner.
-5. **No unit tests** — out of scope for the time limit.
+
+## Automated Testing Verification
+
+- 68 submitted source test methods.
+- 78 executed test cases.
+- 78 passed, 0 failed, 0 skipped.
+- `EventService`: 100% line coverage.
+- `AdminService`: 100% line coverage.
 
 ---
 

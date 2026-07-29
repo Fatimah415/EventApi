@@ -5,14 +5,17 @@
 The assignment requires meaningful tests for at least two services and greater than 80% combined coverage. The submission coverage profile measures exactly:
 
 - `EventService` — validation, mapping, file lifecycle, error cleanup, and repository coordination.
-- `FileService` — validation delegation, secure file creation, deletion guards, and path safety.
+- `AdminService` — role validation, user entity-to-DTO mapping, empty/not-found results, analytics and booking DTO pass-through, logging, and repository coordination.
 
 The profile is deliberately named `coverlet.submission.runsettings` and does not claim whole-application coverage. Controller and repository tests still run, but their production classes are not included in the two-service coverage percentage.
+
+`FileServiceTests` and `FileValidatorTests` remain useful additional tests. They are not presented as substitutes for the mentor-required `AdminServiceTests`.
 
 ## Tooling and test design
 
 - xUnit is the test runner.
 - Moq isolates service and controller dependencies for fast unit tests.
+- FluentAssertions 8.10.0 provides the assertions used throughout the submitted test files.
 - `WebApplicationFactory<Program>` hosts the real HTTP pipeline.
 - EF Core InMemory provides a unique database per integration-test instance and loads deterministic `HasData` records.
 - Integration tests use real signed JWTs for anonymous, standard-user, and administrator authorization outcomes.
@@ -38,13 +41,12 @@ Open the generated `coverage.cobertura.xml` in Visual Studio Fine Code Coverage,
 
 ## Verified submission result
 
-Final local verification on 21 July 2026:
+Final local verification on 29 July 2026:
 
-- 63 tests passed; 0 failed; 0 skipped.
+- 78 test cases passed; 0 failed; 0 skipped (68 source test methods; theories expand to multiple cases).
 - `EventService`: 100% line coverage (141/141 unique executable lines).
-- `FileService`: 92.45% line coverage (49/53 unique executable lines).
-- Combined: 97.94% line coverage (190/194) and 94.12% branch coverage (48/51).
-- Coverlet's XML rate fields are truncated to 97.93% and 94.11%; the displayed percentages above are the same ratios rounded to two decimal places.
+- `AdminService`: 100% line coverage (29/29 unique executable lines).
+- Combined: 100% line coverage (170/170) and 100% branch coverage (39/39).
 - Cobertura evidence: `TestResults/SubmissionTwoServices/<run-id>/coverage.cobertura.xml` after running the command above.
 
 ## UAT

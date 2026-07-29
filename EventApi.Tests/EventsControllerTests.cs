@@ -1,6 +1,7 @@
 using EventApi.Controllers;
 using EventApi.Models;
 using EventApi.Services;
+using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
@@ -21,7 +22,7 @@ public class EventsControllerTests
 
         var result = await CreateController().GetWeather(10);
 
-        Assert.IsType<NotFoundObjectResult>(result);
+        result.Should().BeOfType<NotFoundObjectResult>();
         _weatherServiceMock.Verify(
             service => service.GetWeatherAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()),
             Times.Never);
@@ -37,7 +38,7 @@ public class EventsControllerTests
 
         var result = await CreateController().GetWeather(10);
 
-        Assert.IsType<BadRequestObjectResult>(result);
+        result.Should().BeOfType<BadRequestObjectResult>();
         _weatherServiceMock.Verify(
             service => service.GetWeatherAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()),
             Times.Never);
@@ -54,8 +55,8 @@ public class EventsControllerTests
 
         var result = await CreateController().GetWeather(10);
 
-        var ok = Assert.IsType<OkObjectResult>(result);
-        Assert.Same(weather, ok.Value);
+        var ok = result.Should().BeOfType<OkObjectResult>().Subject;
+        ok.Value.Should().BeSameAs(weather);
     }
 
     [Fact]
@@ -66,7 +67,7 @@ public class EventsControllerTests
 
         var result = await controller.Create(new CreateEventDto());
 
-        Assert.IsType<BadRequestObjectResult>(result);
+        result.Should().BeOfType<BadRequestObjectResult>();
         _eventServiceMock.Verify(service => service.CreateAsync(It.IsAny<CreateEventDto>()), Times.Never);
     }
 
@@ -78,8 +79,8 @@ public class EventsControllerTests
 
         var result = await CreateController().Create(dto);
 
-        var badRequest = Assert.IsType<BadRequestObjectResult>(result);
-        Assert.Contains("does not exist", badRequest.Value?.ToString(), StringComparison.OrdinalIgnoreCase);
+        var badRequest = result.Should().BeOfType<BadRequestObjectResult>().Subject;
+        badRequest.Value?.ToString().Should().ContainEquivalentOf("does not exist");
     }
 
     [Fact]
@@ -90,7 +91,7 @@ public class EventsControllerTests
 
         var result = await controller.Update(1, new UpdateEventDto());
 
-        Assert.IsType<BadRequestObjectResult>(result);
+        result.Should().BeOfType<BadRequestObjectResult>();
         _eventServiceMock.Verify(
             service => service.UpdateAsync(It.IsAny<int>(), It.IsAny<UpdateEventDto>()),
             Times.Never);
